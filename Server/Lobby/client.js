@@ -2,7 +2,7 @@
 
 function client()
 {
-	var cl_socket;	
+	var cl_socket;
 }
 
 exports.CreateClient(socket)
