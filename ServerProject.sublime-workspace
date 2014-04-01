@@ -1,0 +1,331 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Listen",
+				"m_listenSocket"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "ServerProject.sublime-project",
+			"settings":
+			{
+				"buffer_size": 135,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "var app = require('http').createServer(handler)\n		, io = require('socket.io').listen(app)\n		, fs = require('fs')\n\napp.listen(8080);\n\nfunction handler (req, res)\n{\n	fs.readFile(__dirname + '/index.html',\n		function (err, data)\n		{\n			if (err)\n			{\n				res.writeHead(500);\n				return res.end('Error loading index.html');\n			}\n\n			res.writeHead(200);\n			res.end(data);\n		});\n}\n\nio.sockets.on('connection', function(socket)\n{\n	socket.emit('news', { hello: 'world' });\n	socket.on('my other event', function(data)\n	{\n		console.log(data);\n	});\n});",
+			"file": "Server.js",
+			"file_size": -1,
+			"file_write_time": -1,
+			"settings":
+			{
+				"buffer_size": 540,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+			"settings":
+			{
+				"buffer_size": 30,
+				"line_ending": "Windows",
+				"name": "untitled.sublime-build"
+			}
+		}
+	],
+	"build_system": "Packages/User/nodeJS.sublime-build",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"pi",
+				"Package Control: Install Package"
+			],
+			[
+				"package ",
+				"Package Control: Remove Package"
+			],
+			[
+				"table enable",
+				"Table Editor: Enable for current view"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
+			],
+			[
+				"sync",
+				"DevSync: Perform Full Project Sync"
+			],
+			[
+				"project",
+				"DevSync: Perform Full Project Sync"
+			]
+		],
+		"width": 475.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/James/Documents/Server/New Text Document.sublime-workspace",
+		"/C/Users/James/Documents/Server/New Text Document.txt",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Server/ClassServer.cpp",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Server/ClassServer.h",
+		"/F/SteamLibrary/SteamApps/common/Silent Hunter 5/data/Menu/menu.txt",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/Assignment1-AdvNumGuessingGame/Server/AdvServer.cpp",
+		"/C/Quench/Builds/Build 3/Quench_Data/output_log.txt",
+		"/C/Users/James/AppData/Local/Unity/Editor/Editor.log",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/UDP Time/UDPTime-Client-Server/UDPTimeServer/Server.cpp",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Client/TCPClient.cpp",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Client/maintest.cpp",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Client/TCPClient.h",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/Assignment2-ConcurrentBlackJack/BlackJackClient Protocol 1.0.txt",
+		"/C/Users/James/AppData/Roaming/VisualAssist/Dict/UserWords.txt",
+		"/C/Quench/Builds/Build 2/Quench_Data/output_log.txt",
+		"/C/Users/James/AppData/Local/Temp/SDKSetup_7.0.6918.0.log",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/Table Editor/README.md",
+		"/C/Users/James/AppData/Local/Temp/Rar$DIa0.719/Readme.txt",
+		"/C/Users/James/Documents/gitignore_global.txt",
+		"/C/Users/James/Documents/Networking/Class Model/MessageInput.cpp",
+		"/C/Users/James/Documents/Networking/Class Model/MessageOutput.cpp",
+		"/C/Users/James/Documents/Networking/Class Model/Server.cpp",
+		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Server/maintest.cpp",
+		"/F/SteamLibrary/SteamApps/common/Silent Hunter 5/MODSJSGME/EquipmentUpdated_Fix_v1_4/documentation/ReadMe.txt",
+		"/C/Users/James/Downloads/Silent Hunter 5 Mods/Equip_Upgrades_Fix_1_4_AFFOE_151/Documentation/Readtme.txt",
+		"/C/Users/James/Downloads/Adobe Illustrator CS6 16.0.0 (32-64 bit) [ChingLiu]/ChingLiu.Install.Notes.nfo",
+		"/C/Users/James/Downloads/Adobe Photoshop CS6 13.0.1 Final  Multilanguage (cracked dll) [ChingLiu]/ChingLiu.Notes.nfo",
+		"/C/Users/James/Documents/Networking/Class Model/MessageInput.java",
+		"/C/Users/James/Documents/Networking/Class Model/Server.h",
+		"/C/Users/James/Documents/Networking/Class Model/TCPServer.h"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"scaeform"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "ServerProject.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 135,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Server.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 540,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								229,
+								229
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 30,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								27,
+								27
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "ServerProject.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
