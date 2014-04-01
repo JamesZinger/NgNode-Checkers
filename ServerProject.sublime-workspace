@@ -4,8 +4,12 @@
 		"selected_items":
 		[
 			[
-				"req",
-				"require"
+				"for",
+				"for	for (…) {…}"
+			],
+			[
+				"fo",
+				"for	for (…) {…}"
 			],
 			[
 				"Listen",
@@ -16,26 +20,26 @@
 	"buffers":
 	[
 		{
+			"file": "ServerProject.sublime-project",
+			"settings":
+			{
+				"buffer_size": 73,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "Server/server.js",
 			"settings":
 			{
-				"buffer_size": 693,
+				"buffer_size": 742,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Server/Game/game.js",
+			"file": "Server/Game/checkers.js",
 			"settings":
 			{
-				"buffer_size": 133,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "package.json",
-			"settings":
-			{
-				"buffer_size": 178,
+				"buffer_size": 320,
 				"line_ending": "Windows"
 			}
 		},
@@ -43,7 +47,23 @@
 			"file": "Server/input.js",
 			"settings":
 			{
-				"buffer_size": 186,
+				"buffer_size": 202,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Server/Lobby/client.js",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Server/Lobby/lobby.js",
+			"settings":
+			{
+				"buffer_size": 337,
 				"line_ending": "Windows"
 			}
 		}
@@ -59,28 +79,16 @@
 				"Package Control: Install Package"
 			],
 			[
-				"remove",
-				"Package Control: Remove Package"
-			],
-			[
-				"hint",
-				"JSHint"
-			],
-			[
-				"package",
-				"Package Control: Remove Package"
-			],
-			[
-				"format",
-				"Format: Javascript"
-			],
-			[
 				"package ",
 				"Package Control: Remove Package"
 			],
 			[
 				"table enable",
 				"Table Editor: Enable for current view"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
 			],
 			[
 				"sync",
@@ -91,7 +99,7 @@
 				"DevSync: Perform Full Project Sync"
 			]
 		],
-		"width": 576.0
+		"width": 536.0
 	},
 	"console":
 	{
@@ -112,16 +120,11 @@
 	},
 	"file_history":
 	[
-		"/C/Users/James/Git/NgNode-Checkers/Client/index.html",
-		"/C/Users/James/Git/NgNode-Checkers/ServerProject.sublime-project",
-		"/C/Users/James/Git/NgNode-Checkers/Server/lobby.js",
-		"/C/Users/James/Git/NgNode-Checkers/Server/player.js",
-		"/C/Users/James/Git/NgNode-Checkers/Server/game.js",
-		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/JsFormat/JsFormat.sublime-settings",
-		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/JsFormat.sublime-settings",
-		"/C/Users/James/Git/NgNode-Checkers/Server/input.js",
-		"/C/Users/James/Git/NgNode-Checkers/Server.js",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
 		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/Default/Default (Windows).sublime-keymap",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/James/Git/NgNode-Checkers/Server.js",
 		"/C/Users/James/Documents/Server/New Text Document.sublime-workspace",
 		"/C/Users/James/Documents/Server/New Text Document.txt",
 		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Server/ClassServer.cpp",
@@ -155,7 +158,7 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
@@ -169,6 +172,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			": ",
 			"scaeform"
 		],
 		"highlight": true,
@@ -192,76 +196,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "Server/server.js",
+					"file": "ServerProject.sublime-project",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 693,
+						"buffer_size": 73,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								546,
-								546
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "Server/Game/game.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 133,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								133,
-								133
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "package.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 178,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								27,
-								27
+								17,
+								17
 							]
 						],
 						"settings":
@@ -273,6 +220,63 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Server/server.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 742,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								242,
+								242
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Server/Game/checkers.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 320,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								320,
+								320
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -287,20 +291,77 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 186,
+						"buffer_size": 202,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								179,
-								179
+								198,
+								198
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Server/Lobby/client.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Server/Lobby/lobby.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 337,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								313,
+								313
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -352,7 +413,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 100.0
+		"height": 279.0
 	},
 	"output.find_results":
 	{

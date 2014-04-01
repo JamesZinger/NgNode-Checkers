@@ -1,12 +1,12 @@
-var 	app = require('http').createServer(handler), 
-		io 	= require('socket.io').listen(app), 
-		fs 	= require('fs')
+var app = require('http').createServer(handler); 
+var	io 	= require('socket.io').listen(app); 
+var	fs 	= require('fs');
 
 var input 	=	require('./input.js');
-var lobby 	=	require('./lobby.js');
-var game 	= 	require('./game.js');
+var lobby 	=	require('./Lobby/lobby.js');
+var game 	= 	require('./Game/checkers.js');
 
-app.listen(8080);
+app.listen( 8080 );
 
 function handler (req, res)
 {
@@ -21,15 +21,18 @@ function handler (req, res)
 
 			res.writeHead( 200 );
 			res.end(data);
-		});
+		}
+	);
 }
 
 io.sockets.on('connection', function(socket)
 {
-	input.SetupEvents(socket);
-	socket.emit('news', { hello: 'world' });
-	socket.on('my other event', function(data)
-	{
-		console.log(data);
-	});
+	
+	input.SetupEvents(socket, game, lobby);
+
+	//socket.emit('news', { hello: 'world' });
+	//socket.on('my other event', function(data)
+	//{
+	//	console.log(data);
+	//});
 });
