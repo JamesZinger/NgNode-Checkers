@@ -2,11 +2,11 @@ exports.SetupEvents = function(socket, game, lobby)
 {
 	socket.on('Lobby', function(data)
 	{
-		game.request(data);
+		lobby.Request(socket, data);
 	});
 
 	socket.on('Game', function(data)
 	{
-		lobby.request(data);
+		game.Request(socket, data);
 	});
 }

@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"for",
+				"for	for (…) {…}"
+			],
+			[
+				"fo",
+				"for	for (…) {…}"
+			],
+			[
 				"Listen",
 				"m_listenSocket"
 			]
@@ -15,28 +23,48 @@
 			"file": "ServerProject.sublime-project",
 			"settings":
 			{
-				"buffer_size": 135,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "var app = require('http').createServer(handler)\n		, io = require('socket.io').listen(app)\n		, fs = require('fs')\n\napp.listen(8080);\n\nfunction handler (req, res)\n{\n	fs.readFile(__dirname + '/index.html',\n		function (err, data)\n		{\n			if (err)\n			{\n				res.writeHead(500);\n				return res.end('Error loading index.html');\n			}\n\n			res.writeHead(200);\n			res.end(data);\n		});\n}\n\nio.sockets.on('connection', function(socket)\n{\n	socket.emit('news', { hello: 'world' });\n	socket.on('my other event', function(data)\n	{\n		console.log(data);\n	});\n});",
-			"file": "Server.js",
-			"file_size": -1,
-			"file_write_time": -1,
-			"settings":
-			{
-				"buffer_size": 540,
+				"buffer_size": 73,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+			"file": "Server/server.js",
 			"settings":
 			{
-				"buffer_size": 30,
-				"line_ending": "Windows",
-				"name": "untitled.sublime-build"
+				"buffer_size": 742,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Server/Game/checkers.js",
+			"settings":
+			{
+				"buffer_size": 320,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Server/input.js",
+			"settings":
+			{
+				"buffer_size": 202,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Server/Lobby/client.js",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Server/Lobby/lobby.js",
+			"settings":
+			{
+				"buffer_size": 337,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -71,7 +99,7 @@
 				"DevSync: Perform Full Project Sync"
 			]
 		],
-		"width": 475.0
+		"width": 536.0
 	},
 	"console":
 	{
@@ -92,6 +120,11 @@
 	},
 	"file_history":
 	[
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/Default/Default (Windows).sublime-keymap",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/James/Git/NgNode-Checkers/Server.js",
 		"/C/Users/James/Documents/Server/New Text Document.sublime-workspace",
 		"/C/Users/James/Documents/Server/New Text Document.txt",
 		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Server/ClassServer.cpp",
@@ -125,7 +158,7 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
@@ -139,6 +172,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			": ",
 			"scaeform"
 		],
 		"highlight": true,
@@ -166,15 +200,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 135,
+						"buffer_size": 73,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								17,
+								17
 							]
 						],
 						"settings":
@@ -190,24 +224,25 @@
 				},
 				{
 					"buffer": 1,
-					"file": "Server.js",
+					"file": "Server/server.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 540,
+						"buffer_size": 742,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								229,
-								229
+								242,
+								242
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -218,30 +253,121 @@
 				},
 				{
 					"buffer": 2,
-					"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+					"file": "Server/Game/checkers.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 30,
+						"buffer_size": 320,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								27,
-								27
+								320,
+								320
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 3,
+					"file": "Server/input.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 202,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								198,
+								198
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Server/Lobby/client.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Server/Lobby/lobby.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 337,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								313,
+								313
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -264,11 +390,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":
@@ -280,7 +413,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 100.0
+		"height": 279.0
 	},
 	"output.find_results":
 	{
