@@ -9,4 +9,4 @@ exports.SetupEvents = function(socket, game, lobby)
 	{
 		game.Request(socket, data);
 	});
-}
+};

@@ -1,8 +1,13 @@
 var Players = new Array();
 
+function Checkers()
+{
+	var id;
+}
+
 exports.Request = function(socket, data)
 {
-	
+	//Decode the JSON API
 };
 
 exports.AddPlayer = function(socket, player)

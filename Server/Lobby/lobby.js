@@ -1,8 +1,9 @@
-var Clients = new Array();
 
-var Games = new Array();
+var cl_template = require('./client.js');
+var Clients = [];
+var Games = [];
 
-exports.Request = function(socket, data)
+function Request(socket, data)
 {
 	//Decode the JSON API
 }
@@ -12,17 +13,23 @@ exports.Request = function(socket, data)
 exports.AddClient = function(socket)
 {
 	Clients.push(
-		{socket: require('./client.js')}
+		{socket: cl_template.CreateClient(socket)}
 		);
-}
+
+	socket.on('Lobby', function(data)
+	{
+		Request(socket, this);
+	});
+
+};
 
 
 exports.GetClients = function()
 {
-	var returns = new Array();
+	var returns = [];
 	for (var i = 0; i < Clients.length; i++) {
 		returns.push(Clients[i]);
-	};
+	}
 	return returns;
-}
+};
 
