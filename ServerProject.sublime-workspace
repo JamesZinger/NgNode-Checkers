@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"req",
+				"require"
+			],
+			[
 				"Listen",
 				"m_listenSocket"
 			]
@@ -12,31 +16,35 @@
 	"buffers":
 	[
 		{
-			"file": "ServerProject.sublime-project",
+			"file": "Server/server.js",
 			"settings":
 			{
-				"buffer_size": 135,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "var app = require('http').createServer(handler)\n		, io = require('socket.io').listen(app)\n		, fs = require('fs')\n\napp.listen(8080);\n\nfunction handler (req, res)\n{\n	fs.readFile(__dirname + '/index.html',\n		function (err, data)\n		{\n			if (err)\n			{\n				res.writeHead(500);\n				return res.end('Error loading index.html');\n			}\n\n			res.writeHead(200);\n			res.end(data);\n		});\n}\n\nio.sockets.on('connection', function(socket)\n{\n	socket.emit('news', { hello: 'world' });\n	socket.on('my other event', function(data)\n	{\n		console.log(data);\n	});\n});",
-			"file": "Server.js",
-			"file_size": -1,
-			"file_write_time": -1,
-			"settings":
-			{
-				"buffer_size": 540,
+				"buffer_size": 693,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+			"file": "Server/Game/game.js",
 			"settings":
 			{
-				"buffer_size": 30,
-				"line_ending": "Windows",
-				"name": "untitled.sublime-build"
+				"buffer_size": 133,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "package.json",
+			"settings":
+			{
+				"buffer_size": 178,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Server/input.js",
+			"settings":
+			{
+				"buffer_size": 186,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -51,16 +59,28 @@
 				"Package Control: Install Package"
 			],
 			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"hint",
+				"JSHint"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
+			],
+			[
+				"format",
+				"Format: Javascript"
+			],
+			[
 				"package ",
 				"Package Control: Remove Package"
 			],
 			[
 				"table enable",
 				"Table Editor: Enable for current view"
-			],
-			[
-				"package",
-				"Package Control: Remove Package"
 			],
 			[
 				"sync",
@@ -71,7 +91,7 @@
 				"DevSync: Perform Full Project Sync"
 			]
 		],
-		"width": 475.0
+		"width": 576.0
 	},
 	"console":
 	{
@@ -92,6 +112,16 @@
 	},
 	"file_history":
 	[
+		"/C/Users/James/Git/NgNode-Checkers/Client/index.html",
+		"/C/Users/James/Git/NgNode-Checkers/ServerProject.sublime-project",
+		"/C/Users/James/Git/NgNode-Checkers/Server/lobby.js",
+		"/C/Users/James/Git/NgNode-Checkers/Server/player.js",
+		"/C/Users/James/Git/NgNode-Checkers/Server/game.js",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/JsFormat/JsFormat.sublime-settings",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/JsFormat.sublime-settings",
+		"/C/Users/James/Git/NgNode-Checkers/Server/input.js",
+		"/C/Users/James/Git/NgNode-Checkers/Server.js",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
 		"/C/Users/James/Documents/Server/New Text Document.sublime-workspace",
 		"/C/Users/James/Documents/Server/New Text Document.txt",
 		"/C/Users/James/Documents/HumberCollegeGAMEWinter2014/Networking/NumberGuessingTCPCPP/NumberGuessingTCPCPP/Server/ClassServer.cpp",
@@ -162,47 +192,48 @@
 			[
 				{
 					"buffer": 0,
-					"file": "ServerProject.sublime-project",
+					"file": "Server/server.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 135,
+						"buffer_size": 693,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								546,
+								546
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Server.js",
+					"file": "Server/Game/game.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 540,
+						"buffer_size": 133,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								229,
-								229
+								133,
+								133
 							]
 						],
 						"settings":
@@ -218,11 +249,11 @@
 				},
 				{
 					"buffer": 2,
-					"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/nodeJS.sublime-build",
+					"file": "package.json",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 30,
+						"buffer_size": 178,
 						"regions":
 						{
 						},
@@ -241,7 +272,41 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 3,
+					"file": "Server/input.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 186,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								179,
+								179
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -264,11 +329,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":
