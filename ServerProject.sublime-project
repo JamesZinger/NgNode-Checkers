@@ -3,11 +3,7 @@
 	[
 		{
 			"follow_symlinks": true,
-			"path": "Server"
-		},
-		{
-			"follow_symlinks": true,
-			"path": "Client"
+			"path": "."
 		}
 	]
 }

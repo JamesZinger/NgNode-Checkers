@@ -1,0 +1,9 @@
+{
+    "name": "AxonCheckers",
+    "version": "0.0.1",
+    "description": "AxonCheckers",
+    "dependencies": {
+        "socket.io": "latest"
+    },
+    "author": "James Zinger"
+}
