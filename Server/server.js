@@ -1,10 +1,10 @@
-var app	= require('http').createServer(handler); 
-var	io	= require('socket.io').listen(app); 
-var	fs	= require('fs');
+var app = require('http').createServer(handler); 
+var	io  = require('socket.io').listen(app); 
+var	fs  = require('fs');
 
-var input	=	require('./input.js');
-var lobby	=	require('./Lobby/lobby.js');
-var game	=	require('./Game/checkers.js');
+var input = require('./input.js');
+var lobby = require('./Lobby/lobby.js');
+var game  = require('./Game/checkers.js');
 
 app.listen( process.env.PORT );
 
