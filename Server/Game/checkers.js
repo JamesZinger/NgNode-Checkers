@@ -1,4 +1,4 @@
-var Players = new Array();
+var Players = [];
 
 function Checkers()
 {
@@ -18,12 +18,10 @@ exports.AddPlayer = function(socket, player)
 exports.GetPlayers = function()
 {
 	var returns = [];
-	
 	for (var i = 0; i < Players.length; i++) 
 	{
 		returns.push(Players[i]);
-	}
+	};
 
 	return returns;
-};
-
+}
