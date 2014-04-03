@@ -6,6 +6,7 @@ var Games = [];
 function Request(socket, data)
 {
 	//Decode the JSON API
+	
 }
 
 // Helper for adding clients to the lobby.
@@ -18,7 +19,7 @@ exports.AddClient = function(socket)
 
 	socket.on('Lobby', function(data)
 	{
-		Request(socket, this);
+		Request(socket, data);
 	});
 
 };

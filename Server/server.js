@@ -28,7 +28,7 @@ function handler (req, res)
 io.sockets.on('connection', function(socket)
 {
 	
-	input.SetupEvents(socket, game, lobby);
+	//input.SetupEvents(socket, game, lobby);
 
 	lobby.AddClient(socket);
     
