@@ -1,16 +1,21 @@
+
 var cl_template = require('./client.js');
+var game_template = require('./../Game/checkers.js');
 var Clients = [];
 var Games = [];
 
-exports.Request = function(socket, data)
+function Request(socket, data)
 {
 	//Decode the JSON API
-	console.log("Data");
-};
+	if ( 'undefined' === typeof data || 'undefined' === typeof socket )
+	{
+		return;
+	}
+}
 
 // Helper for adding clients to the lobby.
 // Should be done on connect
-exports.AddClient = function( socket )
+exports.AddClient = function(socket)
 {
 	Clients.push(
 		{socket: cl_template.CreateClient(socket)}
@@ -20,35 +25,19 @@ exports.AddClient = function( socket )
 	{
 		Request(socket, data);
 	});
-	
-	//socket.on('disconnect', onDisconnect(socket) );
-
-	console.log(Clients);
 };
+
 
 exports.GetClients = function()
 {
 	var returns = [];
-	for ( var i = 0; i < Clients.length; i++ )
-	{
-		returns.push( Clients[ i ] );
+	for (var i = 0; i < Clients.length; i++) {
+		returns.push(Clients[i]);
 	}
 	return returns;
 };
 
-
-function onDisconnect(socket)
+function CreateGame(socket)
 {
-	removeClient(socket);
-}
 
-function removeClient(socket)
-{
-	for ( var i = 0; i < Clients.length; i++ )
-	{
-		if (Clients[i].cl_socket == socket)
-		{
-			Clients.splice(i,1);
-		}
-	}
 }

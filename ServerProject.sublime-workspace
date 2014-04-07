@@ -20,13 +20,10 @@
 	"buffers":
 	[
 		{
-			"contents": "var app	= require('http').createServer(handler); \nvar	io	= require('socket.io').listen(app); \nvar	fs	= require('fs');\n\nvar input	=	require('./input.js');\nvar lobby	=	require('./Lobby/lobby.js');\nvar game	=	require('./Game/checkers.js');\n\napp.listen( 3000 );\n\n\n\nfunction handler (req, res)\n{\n	fs.readFile(__dirname + '/../Client/index.html',\n		function (err, data)\n	{\n		if (err)\n		{\n			res.writeHead( 500 );\n			return res.end('Error loading index.html');\n		}\n\n		res.writeHead( 200 );\n		res.end(data);\n\n	});\n}\n\nio.sockets.on('connection', function(socket)\n{\n	console.log(\"Lobby: \" + lobby);\n	//input.SetupEvents(socket, game, lobby);\n\n	lobby.AddClient(socket);\n\n	//socket.emit('news', { hello: 'world' });\n	//socket.on('my other event', function(data)\n	//{\n	//	console.log(data);\n	//});\n});",
 			"file": "Server/server.js",
-			"file_size": 825,
-			"file_write_time": 130413490386511134,
 			"settings":
 			{
-				"buffer_size": 788,
+				"buffer_size": 561,
 				"line_ending": "Windows"
 			}
 		},
@@ -34,8 +31,16 @@
 			"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/SublimeCodeIntel.sublime-settings",
 			"settings":
 			{
-				"buffer_size": 806,
+				"buffer_size": 1062,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/SublimeCodeIntel/SublimeCodeIntel.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 4551,
+				"line_ending": "Unix"
 			}
 		},
 		{
@@ -52,7 +57,7 @@
 			"file": "Server/Lobby/lobby.js",
 			"settings":
 			{
-				"buffer_size": 865,
+				"buffer_size": 707,
 				"line_ending": "Windows"
 			}
 		},
@@ -60,7 +65,7 @@
 			"file": "Server/input.js",
 			"settings":
 			{
-				"buffer_size": 205,
+				"buffer_size": 204,
 				"line_ending": "Windows"
 			}
 		},
@@ -68,7 +73,7 @@
 			"file": "Server/Lobby/client.js",
 			"settings":
 			{
-				"buffer_size": 315,
+				"buffer_size": 412,
 				"line_ending": "Windows"
 			}
 		},
@@ -76,7 +81,7 @@
 			"file": "Client/index.html",
 			"settings":
 			{
-				"buffer_size": 363,
+				"buffer_size": 350,
 				"line_ending": "Windows"
 			}
 		}
@@ -166,8 +171,8 @@
 	},
 	"file_history":
 	[
-		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/SublimeCodeIntel.sublime-settings",
 		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/SublimeCodeIntel/SublimeCodeIntel.sublime-settings",
+		"/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/User/SublimeCodeIntel.sublime-settings",
 		"/C/Users/James/Git/NgNode-Checkers/Server/Lobby/lobby.js",
 		"/C/Users/James/Git/NgNode-Checkers/Server/input.js",
 		"/C/Users/James/Git/NgNode-Checkers/Server/Lobby/client.js",
@@ -250,7 +255,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -259,15 +264,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 788,
+						"buffer_size": 561,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								259,
-								259
+								291,
+								291
 							]
 						],
 						"settings":
@@ -384,7 +389,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -393,15 +398,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 806,
+						"buffer_size": 1062,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								345,
-								632
+								877,
+								878
 							]
 						],
 						"settings":
@@ -508,7 +513,7 @@
 							"codeintel_snippets": true,
 							"codeintel_syntax_map":
 							{
-								"JavaScript": "Node.js"
+								"Python Django": "Python"
 							},
 							"codeintel_tooltips": "popup",
 							"sublime_auto_complete": true,
@@ -520,11 +525,41 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
+					"file": "/C/Users/James/AppData/Roaming/Sublime Text 3/Packages/SublimeCodeIntel/SublimeCodeIntel.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4551,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								287,
+								504
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 48.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
 					"semi_transient": false,
 					"settings":
 					{
@@ -548,24 +583,24 @@
 						"translation.y": 240.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "Server/Lobby/lobby.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 865,
+						"buffer_size": 707,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								417,
-								417
+								0,
+								0
 							]
 						],
 						"settings":
@@ -682,24 +717,157 @@
 						"translation.y": 96.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "Server/input.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 205,
+						"buffer_size": 204,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								202,
-								202
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"JavaScript": "Node.js"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": false,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Server/Lobby/client.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 412,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
 							]
 						],
 						"settings":
@@ -819,152 +987,19 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "Server/Lobby/client.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 315,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								247,
-								247
-							]
-						],
-						"settings":
-						{
-							"auto_complete": false,
-							"codeintel": true,
-							"codeintel_config":
-							{
-								"JavaScript":
-								{
-									"codeintel_max_recursive_dir_depth": 2,
-									"codeintel_scan_files_in_project": false,
-									"javascriptExtraPaths":
-									[
-									]
-								},
-								"PHP":
-								{
-									"codeintel_max_recursive_dir_depth": 5,
-									"codeintel_scan_files_in_project": false,
-									"phpExtraPaths":
-									[
-									]
-								},
-								"Python":
-								{
-									"env":
-									{
-									}
-								}
-							},
-							"codeintel_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_live": true,
-							"codeintel_live_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_max_recursive_dir_depth": 10,
-							"codeintel_scan_exclude_dir":
-							{
-								"JavaScript":
-								[
-									"/build/",
-									"/min/"
-								]
-							},
-							"codeintel_scan_files_in_project": true,
-							"codeintel_selected_catalogs":
-							[
-								"PyWin32",
-								"jQuery",
-								"Rails"
-							],
-							"codeintel_snippets": true,
-							"codeintel_syntax_map":
-							{
-								"JavaScript": "Node.js"
-							},
-							"codeintel_tooltips": "popup",
-							"sublime_auto_complete": false,
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
+					"buffer": 7,
 					"file": "Client/index.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 363,
+						"buffer_size": 350,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								15,
+								0,
 								0
 							]
 						],
@@ -1081,7 +1116,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
