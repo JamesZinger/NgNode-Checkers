@@ -6,6 +6,7 @@ function Checkers()
 {
 	var id = -1;
 	var gameName;
+
 }
 
 function Request(socket, data)
