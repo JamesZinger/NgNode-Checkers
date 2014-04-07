@@ -10,9 +10,10 @@ function client()
 
 exports.CreateClient = function(socket)
 {
-	var cl = client;
+	var cl = client.constructor();
+	console.log("Client: " + cl);
 	cl.cl_socket = socket;
 	cl.cl_id = client_id_counter;
 	client_id_counter++;
 	return cl;
-}
+};

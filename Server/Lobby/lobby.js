@@ -1,16 +1,16 @@
-
 var cl_template = require('./client.js');
 var Clients = [];
 var Games = [];
 
-function Request(socket, data)
+exports.Request = function(socket, data)
 {
 	//Decode the JSON API
-}
+	console.log("Data");
+};
 
 // Helper for adding clients to the lobby.
 // Should be done on connect
-exports.AddClient = function(socket)
+exports.AddClient = function( socket )
 {
 	Clients.push(
 		{socket: cl_template.CreateClient(socket)}
@@ -18,18 +18,37 @@ exports.AddClient = function(socket)
 
 	socket.on('Lobby', function(data)
 	{
-		Request(socket, this);
+		Request(socket, data);
 	});
+	
+	//socket.on('disconnect', onDisconnect(socket) );
 
+	console.log(Clients);
 };
-
 
 exports.GetClients = function()
 {
 	var returns = [];
-	for (var i = 0; i < Clients.length; i++) {
-		returns.push(Clients[i]);
+	for ( var i = 0; i < Clients.length; i++ )
+	{
+		returns.push( Clients[ i ] );
 	}
 	return returns;
 };
 
+
+function onDisconnect(socket)
+{
+	removeClient(socket);
+}
+
+function removeClient(socket)
+{
+	for ( var i = 0; i < Clients.length; i++ )
+	{
+		if (Clients[i].cl_socket == socket)
+		{
+			Clients.splice(i,1);
+		}
+	}
+}
