@@ -1,3 +1,6 @@
+# Binary Dumps
+*.dmp
+
 # Logs
 logs
 *.log
