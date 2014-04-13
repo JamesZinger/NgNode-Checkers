@@ -6,11 +6,65 @@ var Games = [];
 
 function Request(socket, data)
 {
-	//Decode the JSON API
-	if ( 'undefined' === typeof data || 'undefined' === typeof socket )
+	if ( 'undefined' == typeof socket )
 	{
 		return;
 	}
+
+	var res = {};
+	
+	
+	if ( 'undefined' == typeof data || 'undefined' == typeof data.cmd )
+	{
+		res.data = {
+			approved: false,
+			data: "Error invaild request"
+		};
+	}
+
+	else
+	{
+		switch ( data.cmd )
+		{
+			//Create Game
+			case 'C':
+				res = CreateGame(socket);
+				break;
+
+			//Leave Game
+			case 'L':
+				res = LeaveGame(socket);
+				break;
+
+			//Join Game
+			case 'J':
+				break;
+
+			//Set Ready
+			case 'R':
+				break;
+
+			//Set Wait
+			case 'W':
+				break;
+
+			//Set Name
+			case 'N':
+				break;
+
+			default:
+				res.id = data.id;
+				res.data = {
+					approved: false,
+					data: "Error cannot determine command"
+				};
+
+
+				break;
+		}
+	}
+	
+	socket.emit(res);
 }
 
 // Helper for adding clients to the lobby.
@@ -41,3 +95,9 @@ function CreateGame(socket)
 {
 
 }
+
+function LeaveGame(socket)
+{
+
+}
+
