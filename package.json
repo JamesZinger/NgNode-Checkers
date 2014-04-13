@@ -3,7 +3,8 @@
     "version": "0.0.1",
     "description": "AxonCheckers",
     "dependencies": {
-        "socket.io": "latest"
+        "socket.io": "latest",
+        "express": "3.x"
     },
     "author": ["James Zinger","Jeff Rose"]
 }
