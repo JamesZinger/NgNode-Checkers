@@ -64,7 +64,6 @@ var gameLobby = {
 	  name: 'Kristina',
 	  ready: true
 	} ]
-  } ]
 
 };
 

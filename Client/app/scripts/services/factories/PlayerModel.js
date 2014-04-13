@@ -1,367 +1,126 @@
 /* global app:false */
 'use strict';
 
-app.factory( 'PlayerModel', [ 'LobbyProtocol', 'CheckersProtocol',
+app.factory( 'PlayerModel', [ 'CheckersModel',
   function ( $log ) {
 
-    // Create the player state object
-    var player = {};
+    // Create the player model object
+    var self = {
 
-    //
-    // Member variables
-    //
+      //
+      // Member variables
+      //
 
-    // The name of the player typed in when they log in on the homepage.
-    player.name = '';
+      // The name of the player typed in when they log in on the homepage.
+      name = '',
 
-    // The state of the player ('Available' or 'Playing').
-    player.state = 'Available';
+      // The state of the player ('Available' or 'Playing').
+      state = 'Available',
 
-    // If the player is in a game, the index of this player in the game's player list.
-    // Note: If the player is not in a game, this should be -1.
-    player.index = -1;
+      // If the player is in a game, the index of this player in the game's player list.
+      // Note: If the player is not in a game, this should be -1.
+      index = -1,
 
-    // A reference to the game in the lobby
-    player.gameLobby = null;
+      // The lobby to which the
+      lobby: null,
 
-    // A reference to the game state of the game in progress
-    player.gamePlay = null;
+      // A reference to the game in the lobby
+      gameLobby = null,
 
-    //
-    // Convenience method: Request builder
-    //
+      // A reference to the game state of the game in progress
+      game = null,
 
-    player.createRequest = function ( cmd, data ) {
+      //
+      // Init
+      //
 
-      return {
-        cmd: cmd,
-        data: data,
-        name: player.name
-      };
+      // requestInit() hooks up the given lobby to this player and requests that the
+      // lobby assign a random initial name to the player.
+      requestInit: function ( lobby ) {
 
-    };
+        $log.info( 'PlayerModel.requestInit()' );
 
-    //
-    // Client-initiated lobby actions (Request/Response)
-    //
+        // Store the lobby model reference
+        self.lobby = lobby;
 
-    player.requestCreateGame = function () {
+        // Request that the lobby model assign a random scientist name to the player
+        self.lobby.requestSetName( self, '' );
 
-      $log.info( 'PlayerState.requestCreateGame()' );
+      },
 
-      // Build the request
-      var request = player.createRequest( Constants.LOBBY_REQ_CREATE_GAME, null );
+      //
+      // Player Actions
+      //
 
-      // Emit the request on the lobby channel
-      Socket.emit( 'lobby', request, function ( response ) {
+      // requestCreateGame() issues a request to the lobby model to create a
+      // new game in the lobby with this player as the host.
+      requestCreateGame: function () {
 
-        // TODO
+        $log.info( 'PlayerModel.requestCreateGame()' );
+        self.lobby.requestCreateGame( self );
 
-      } );
+      },
 
-    };
+      // requestLeaveGame() issues a request to the lobby model to have this
+      // player leave the game to which he/she currently belongs. If this player
+      // is the host of the game, the game is cancelled.
+      requestLeaveGame: function () {
 
-    player.requestLeaveGame = function () {
+        $log.info( 'PlayerModel.requestLeaveGame()' );
+        self.lobby.requestLeaveGame( self );
 
-      $log.info( 'PlayerState.requestLeaveGame()' );
+      },
 
-      // Build the request
-      var request = player.createRequest( Constants.LOBBY_REQ_LEAVE_GAME, null );
+      // requestJoinGame() issues a request to the lobby model to join the game
+      // hosted by the user whose name matches the given hostName.
+      requestJoinGame: function ( hostName ) {
 
-      // Emit the request on the lobby channel
-      Socket.emit( 'lobby', request, function ( response ) {
+        $log.info( 'PlayerModel.requestJoinGame()' );
+        self.lobby.requestJoinGame( self, hostName );
 
-        // TODO
+      },
 
-      } );
+      // requestSetName()  issues a request to the lobby model to change this
+      // player's name to the given newName. If newName is set to '', a random
+      // unique scientist name will be reutrned from the server.
+      requestSetName: function ( newName ) {
 
-    };
+        $log.info( 'PlayerModel.requestSetName()' );
+        self.lobby.requestSetName( self, newName );
 
-    player.requestJoinGame = function ( hostName ) {
+      },
 
-      $log.info( 'PlayerState.requestJoinGame()' );
+      // requestSetReady() issues a request to the lobby model to change this 
+      // player's readiness be set to 'Ready' in the player's current game.
+      requestSetReady: function () {
 
-      // Build the request
-      var request = player.createRequest( Constants.LOBBY_REQ_JOIN_GAME, hostName );
+        $log.info( 'PlayerModel.requestSetReady()' );
+        self.lobby.requestSetReady( self );
 
-      // Emit the request on the lobby channel
-      Socket.emit( 'lobby', request, function ( response ) {
+      },
 
-        // TODO
+      // requestSetWaiting() issues a request to the lobby model to change this 
+      // player's readiness be set to 'Waiting' in the player's current game.
+      requestSetWaiting: function () {
 
-      } );
+        $log.info( 'PlayerModel.requestSetWaiting()' );
+        self.lobby.requestSetWaiting( self );
 
-    };
+      },
 
-    player.requestSetName = function ( newName ) {
+      // requestMovePiece() issues a request to the checkers model to move the
+      // given piece to the given (x, y) board space.
+      requestMovePiece: function ( piece, x, y ) {
 
-      $log.info( 'PlayerState.requestSetName()' );
+        $log.info( 'PlayerModel.requestMovePiece()' );
+        self.game.requestMovePiece( self, piece, x, y );
 
-      // Build the request
-      var request = player.createRequest( Constants.LOBBY_REQ_SET_NAME, newName );
-
-      // Emit the request on the lobby channel
-      Socket.emit( 'lobby', request, function ( response ) {
-
-        // TODO
-
-      } );
-
-    };
-
-    player.requestSetReady = function () {
-
-      $log.info( 'PlayerState.requestSetReady()' );
-
-      // Build the request
-      var request = player.createRequest( Constants.LOBBY_REQ_SET_READY, null );
-
-      // Emit the request on the lobby channel
-      Socket.emit( 'lobby', request, function ( response ) {
-
-        // TODO
-
-      } );
-
-    };
-
-    player.requestSetWaiting = function () {
-
-      $log.info( 'PlayerState.requestSetWaiting()' );
-
-      // Build the request
-      var request = player.createRequest( Constants.LOBBY_REQ_SET_WAITING, null );
-
-      // Emit the request on the lobby channel
-      Socket.emit( 'lobby', request, function ( response ) {
-
-        // TODO
-
-      } );
-
-    };
-
-    //
-    // Server-initiated lobby actions (Push notifications)
-    // 
-
-    // None
-
-    //
-    // Client-initiated gameplay actions (Request/Response)
-    //
-
-    player.requestMovePiece = function ( piece, x, y ) {
-
-      $log.info( 'PlayerState.requestMovePiece()' );
-
-      // Build the request
-      var request = player.createRequest( Constants.LOBBY_REQ_MOVE_PIECE, {
-        piece: piece,
-        x: x,
-        y: y
-      } );
-
-      // Emit the request on the lobby channel
-      Socket.emit( 'lobby', request, function ( response ) {
-
-        // TODO
-
-      } );
-
-    };
-
-    //
-    // Server-initiated gameplay actions (Push notifications)
-    //
-
-    player.onBeginTurnPushed = function () {
-
-      $log.info( 'PlayerState.onBeginTurnPushed()' );
-
-    };
-
-    player.onGameOverPushed = function () {
-
-      $log.info( 'PlayerState.onGameOverPushed()' );
-
-    };
-
-    player.onPiecePositionPushed = function () {
-
-      $log.info( 'PlayerState.onPiecePositionPushed()' );
-
-    };
-
-    player.onPieceDeadPushed = function () {
-
-      $log.info( 'PlayerState.onPieceDeadPushed()' );
-
-    };
-
-    player.onPieceKingedPushed = function () {
-
-      $log.info( 'PlayerState.onPieceKingedPushed()' );
-
-    };
-
-
-
-    /*
-
-  // cancelGame() is called when the player wishes to cancel their currently hosted game.
-  player.cancelGame = function () {
-
-    $log.info( 'PlayerState.cancelGame()' );
-
-    // Throw exceptions for common error cases (courtesy authorization).
-    if ( player.gameLobby === null ) {
-      throw 'PlayerState.cancelGame >> Cannot cancel game. Not in a game!';
-    } else if ( player.gameLobby.players[ 0 ].name !== player.name ) {
-      throw 'PlayerState.cancelGame >> Cannot cancel game. You are not the creator of the game!';
-    }
-
-    // Remove the game from the lobby games list.
-    var gameIndex = $scope.lobby.games.indexOf( player.gameLobby );
-    $scope.lobby.games.splice( gameIndex, 1 );
-
-    // Remove the reference to the game.
-    player.gameLobby = null;
-
-    // Set the index to -1 to indicate that we're not in a game.
-    player.index = -1;
-
-  };
-
-  // createGame() is called when the player wishes to create a new game, hosted by them.
-  player.createGame = function () {
-
-    $log.info( 'PlayerState.createGame()' );
-
-    // Throw exceptions for common error cases (courtesy authorization).
-    if ( player.gameLobby !== null ) {
-      throw 'PlayerState.createGame() >> Cannot create game. Currently in a game!';
-    }
-
-    // Create a new game to add to the game list.
-    var newGame = {
-      players: [ {
-        name: player.name,
-        ready: false
-      } ]
-    };
-
-    // Keep a reference to this game
-    player.gameLobby = newGame;
-
-    // The game creator is always index 0
-    player.index = 0;
-
-    // Push this into the lobby's game list
-    $scope.lobby.games.push( newGame );
-
-  };
-
-  // joinGame() is called when the player wishes to join another player's game.
-  player.joinGame = function ( hostName ) {
-
-    $log.info( 'PlayerState.joinGame()' );
-
-    // Find the index of the game with this host in the games list (linear search)
-    for ( var gameIndex = 0; gameIndex < $scope.lobby.games.length; gameIndex++ ) {
-      if ( hostName === $scope.lobby.games[ gameIndex ].players[ 0 ].name ) {
-        break;
       }
+
     }
 
-    // If no match was found, then something terrible happened. Throw an exception!
-    if ( gameIndex === $scope.lobby.games.length ) {
-      throw 'PlayerState.joinGame >> Cannot join game. Game was not found in game list. Uh oh.';
-    }
-
-    // Use the game index to get a reference of the game to join.
-    var gameToJoin = $scope.lobby.games[ gameIndex ];
-
-    // Throw exceptions for common error cases (courtesy authorization).
-    if ( player.gameLobby !== null ) {
-      throw 'PlayerState.joinGame >> Cannot join game. Currently in a game!';
-    } else if ( gameToJoin.players.length > 1 ) {
-      throw 'PlayerState.joinGame >> Cannot join game. Game is full!';
-    }
-
-    // Create a player object to add to the game's player list
-    var gamePlayer = {
-      name: player.name,
-      ready: false
-    };
-
-    // Keep a reference to this game
-    player.gameLobby = gameToJoin;
-
-    // Store the index of this player in the game
-    player.index = gameToJoin.players.length;
-
-    // Create a new player in the game matching this player
-    gameToJoin.players.push( gamePlayer );
-
-  };
-
-  // leaveGame() is called when the player wishes to leave another player's game.
-  player.leaveGame = function () {
-
-    $log.info( 'PlayerState.leaveGame()' );
-
-    // Throw exceptions for common error cases (courtesy authorization).
-    if ( player.gameLobby === null ) {
-      throw 'PlayerState.leaveGame >> Cannot leave game. Not in a game!';
-    } else if ( player.gameLobby.players[ 0 ].name === player.name ) {
-      throw 'PlayerState.leaveGame >> Cannot leave game. You are the creator of the game! You must cancel it instead!';
-    }
-
-    // Remove this player from the game
-    player.gameLobby.players.splice( player.index, 1 );
-
-    // Remove the reference to the game
-    player.gameLobby = null;
-
-    // Set the index to -1 to indicate that we're not in a game
-    player.index = -1;
-
-  };
-
-  // setReady() is called when the player wishes to indicate to their current game that they are ready to play.
-  player.setReady = function () {
-
-    $log.info( 'PlayerState.setReady()' );
-
-    // Throw exceptions for common error cases (courtesy authorization).
-    if ( player.gameLobby === null ) {
-      throw 'PlayerState.setReady >> Cannot set readiness. Lobby game is null!';
-    }
-
-    // Set the player's readiness to TRUE
-    player.gameLobby.players[ player.index ].ready = true;
-
-  };
-
-  // setWaiting() is called when the player wishes to indicated to their current game that they are not yet ready.
-  player.setWaiting = function () {
-
-    $log.info( 'PlayerState.setWaiting()' );
-
-    // Throw exceptions for common error cases (courtesy authorization).
-    if ( player.gameLobby === null ) {
-      throw 'PlayerState.setWaiting >> Cannot set readiness. Lobby game is null!';
-    }
-
-    // Set the player's readiness to TRUE
-    player.gameLobby.players[ player.index ].ready = false;
-
-  };
-
-  */
-
-    return player;
+    return self;
 
   }
+
 ] );

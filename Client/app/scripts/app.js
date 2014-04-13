@@ -10,6 +10,9 @@ var app = angular.module( 'ngCheckersApp', [
   'ngRoute'
 ] );
 
+// Assign the server address
+app.constant( 'SERVER_ADDRESS', 'http://localhost:3000/' );
+
 // Perform the startup app configuration
 app.config( function ( $routeProvider ) {
 

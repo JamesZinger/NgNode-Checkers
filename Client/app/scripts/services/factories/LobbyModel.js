@@ -1,7 +1,7 @@
 /* global app:false */
 'use strict';
 
-app.factory( 'LobbyModel', [ 'LobbyProtocol',
+app.factory( 'LobbyModel', [ 'LobbyProtocol', 
   function ( $log ) {
 
     // init() will be called just prior to returning the lobby model object.
@@ -348,7 +348,7 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
           } else {
 
-            // Update the game
+            // Update the game using the data package
             var index = lobyyModel.indexOfGameByHostPlayerName( hostName );
             games[ index ].players = data.data.players;
 
@@ -378,7 +378,7 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
           } else {
 
             // Name change approved
-            lobbyModel.onSetNameSuccess( player, newName );
+            lobbyModel.onSetNameSuccess( player, data.data );
 
           }
 

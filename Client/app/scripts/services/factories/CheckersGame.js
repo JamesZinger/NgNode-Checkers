@@ -1,6 +1,5 @@
 /* global app:false */
 /* global THREE:false */
-
 'use strict';
 
 app.factory( 'CheckersGame', function ( $log ) {
