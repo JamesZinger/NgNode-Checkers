@@ -1,11 +1,15 @@
 var Players = [];
 
+var game_id_counter = 1;
+
 function Checkers()
 {
-	var id;
+	var id = -1;
+	var gameName;
+
 }
 
-exports.Request = function(socket, data)
+function Request(socket, data)
 {
 	//Decode the JSON API
 };
@@ -24,4 +28,12 @@ exports.GetPlayers = function()
 	};
 
 	return returns;
-}
+};
+
+exports.CreateGame = function(client)
+{
+	var game = Checkers;
+	game.id = game_id_counter;
+	game_id_counter++;
+	var gameName = client.name;
+};

@@ -1,12 +1,16 @@
 
 var cl_template = require('./client.js');
+var game_template = require('./../Game/checkers.js');
 var Clients = [];
 var Games = [];
 
 function Request(socket, data)
 {
 	//Decode the JSON API
-	
+	if ( 'undefined' === typeof data || 'undefined' === typeof socket )
+	{
+		return;
+	}
 }
 
 // Helper for adding clients to the lobby.
@@ -21,7 +25,6 @@ exports.AddClient = function(socket)
 	{
 		Request(socket, data);
 	});
-
 };
 
 
@@ -34,3 +37,7 @@ exports.GetClients = function()
 	return returns;
 };
 
+function CreateGame(socket)
+{
+
+}
