@@ -1,22 +1,22 @@
-
+/* global require:false,
+	exports:false */
+'use strict';
 var cl_template = require('./client.js');
 var game_template = require('./../Game/checkers.js');
 var Clients = [];
 var Games = [];
 
-function Request(socket, data)
+function request(socket, data)
 {
 	if ( 'undefined' == typeof socket )
 	{
 		return;
 	}
 
-	var res = {};
-	
-	
+	var res = null;
 	if ( 'undefined' == typeof data || 'undefined' == typeof data.cmd )
 	{
-		res.data = {
+		res = {
 			approved: false,
 			data: "Error invaild request"
 		};
@@ -24,46 +24,47 @@ function Request(socket, data)
 
 	else
 	{
+		var clientContext = Clients[socket];
 		switch ( data.cmd )
 		{
 			//Create Game
 			case 'C':
-				res = CreateGame(socket);
+				res = createGame(clientContext);
 				break;
 
 			//Leave Game
 			case 'L':
-				res = LeaveGame(socket);
+				res = leaveGame(clientContext);
 				break;
 
 			//Join Game
 			case 'J':
+				res = joinGame(clientContext);
 				break;
 
 			//Set Ready
 			case 'R':
+				res = setReady(clientContext);
 				break;
 
 			//Set Wait
 			case 'W':
+				res = setWait(clientContext);
 				break;
 
 			//Set Name
 			case 'N':
+				res = setName(clientContext);
 				break;
 
 			default:
-				res.id = data.id;
-				res.data = {
+				res = {
 					approved: false,
 					data: "Error cannot determine command"
 				};
-
-
 				break;
 		}
 	}
-	
 	socket.emit(res);
 }
 
@@ -71,13 +72,14 @@ function Request(socket, data)
 // Should be done on connect
 exports.AddClient = function(socket)
 {
-	Clients.push(
-		{socket: cl_template.CreateClient(socket)}
-		);
+	Clients[socket] = new cl_template.CreateClient(socket);
+//	Clients.push(
+//		{socket: cl_template.CreateClient(socket)}
+//		);
 
-	socket.on('Lobby', function(data)
+	socket.on('lobby', function(data)
 	{
-		Request(socket, data);
+		request(socket, data);
 	});
 };
 
@@ -91,13 +93,32 @@ exports.GetClients = function()
 	return returns;
 };
 
-function CreateGame(socket)
+function createGame(clientContext)
 {
 
 }
 
-function LeaveGame(socket)
+function leaveGame(clientContext)
 {
 
 }
 
+function joinGame(clientContext)
+{
+
+}
+
+function setReady(clientContext)
+{
+
+}
+
+function setWait(clientContext)
+{
+
+}
+
+function setName(clientContext)
+{
+
+}

@@ -1,21 +1,38 @@
-var app = require('http').createServer(handler); 
-var	io  = require('socket.io').listen(app); 
+/* global require:false,
+	exports:false,
+	__dirname:false,
+	console:false */
+
+var app = require('express')();
+var server = require('http').createServer(app); 
+var	io  = require('socket.io').listen(server); 
 var	fs  = require('fs');
+var path = require('path');
 
 var lobby = require('./Lobby/lobby.js');
 var game  = require('./Game/checkers.js');
 
-app.listen( 3000 );
+server.listen( 3000 );
+
+app.get('/', function (req, res)
+{
+	res.sendfile(path.resolve(__dirname + '/../Client/dist/index.html'));
+});
+
+app.get(/^(.+)$/, function (req, res) 
+{ 
+	res.sendfile(path.resolve(__dirname + '/../Client/dist/' + req.path));
+});
 
 function handler (req, res)
 {
-	fs.readFile(__dirname + '/../Client/index.html',
+	fs.readFile(__dirname + '/../Client/app/' + req.url,
 		function (err, data)
 		{
 			if (err)
 			{
 				res.writeHead( 500 );
-				return res.end('Error loading index.html');
+				return res.end('Error loading requested file');
 			}
 
 			res.writeHead( 200 );
