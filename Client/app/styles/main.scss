@@ -1,0 +1,309 @@
+$icon-font-path: "/bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
+
+@import 'bootstrap-sass-official/vendor/assets/stylesheets/bootstrap';
+
+// bower:scss
+@import "../bower_components/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap.scss";
+// endbower
+
+
+/*
+ *  General
+ */
+
+/* Obselete Borwser Warning */
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+/* Content */
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+.container {
+  position: relative;
+}
+h1 {
+  font-weight: bold;
+}
+
+/* Fade Transition */
+.reveal-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.reveal-animation.ng-enter {
+  opacity: 0;
+}
+.reveal-animation.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+.reveal-animation.ng-leave {
+  opacity: 1;
+}
+.reveal-animation.ng-leave.ng-leave-active {
+  opacity: 0;
+}
+
+
+/*
+ *  Dashboard Layout (Lobby)
+ */
+
+/* Global add-ons */
+.dashboard .sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Sidebar */
+.dashboard .sidebar {
+  display: none;
+}
+@media (min-width: 768px) {
+  .dashboard .sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+  }
+}
+
+/* Sidebar navigation */
+.dashboard .nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.dashboard .nav-sidebar .player-state {
+  text-align: center;
+}
+
+/*  Main content */
+.dashboard .main {
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .dashboard .main {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+.dashboard .main .page-header {
+  margin-top: 0;
+}
+
+/* Placeholder dashboard ideas */
+.dashboard .placeholders {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.dashboard .placeholders h4 {
+  margin-bottom: 0;
+}
+.dashboard .placeholder {
+  margin-bottom: 20px;
+}
+.dashboard .placeholder img {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.dashboard .list-repeat {
+  line-height: 40px;
+  list-style: none;
+  box-sizing: border-box;
+}
+
+
+/*
+ *  Jumbotron-Narrow Layout (Home)
+ */
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.jumbotron-narrow .header,
+.jumbotron-narrow .marketing,
+.jumbotron-narrow .footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+/* Custom page header */
+.jumbotron-narrow .header {
+  border-bottom: 1px solid #e5e5e5;
+}
+/* Make the masthead heading the same height as the navigation */
+.jumbotron-narrow .header h3 {
+  padding-bottom: 19px;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+}
+
+/* Custom page footer */
+.jumbotron-narrow .footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Customize container */
+.jumbotron-narrow {
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (min-width: 768px) {
+  .jumbotron-narrow {
+    max-width: 730px;
+  }
+}
+.jumbotron-narrow .container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron-narrow .jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron-narrow .jumbotron h1 {
+  padding: 0px;
+  margin: 0px;
+}
+.jumbotron-narrow .jumbotron img {
+  padding: 20px 0px 20px 0px;
+}
+.jumbotron-narrow .jumbotron table {
+  width: 100%;
+}
+/*.jumbotron-narrow .jumbotron td {
+  padding: 0px 20px 0px 20px;
+}*/
+.jumbotron-narrow .jumbotron p {
+  padding: 0px;
+  margin: 0px;
+}
+.jumbotron-narrow .jumbotron .btn {
+  padding: 20px 20px;
+  font-size: 21px;
+}
+
+/* Supporting marketing content */
+.jumbotron-narrow .marketing {
+  margin: 20px 0;
+}
+.jumbotron-narrow .marketing p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .jumbotron-narrow .header,
+  .jumbotron-narrow .marketing,
+  .jumbotron-narrow .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  /* Space out the masthead */
+  .jumbotron-narrow .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron-narrow .jumbotron {
+    border-bottom: 0;
+  }
+}
+
+.jumbotron-narrow input {
+  text-align: center; 
+}
+
+
+/*
+ *  Minimal Layout (Play)
+ */
+
+.minimal {
+  padding: 0px;
+  text-align: center;
+}
+
+
+/*
+ *  Lobby
+ */
+
+.action-button {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.lobby-players h4 {
+  margin-top: 0px;
+}
+
+.lobby-players .player-name {
+  float: left;
+  width: 100%;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.lobby-players .player-state {
+  text-align: right;
+  width: 50px;
+}
+
+.page-header {
+  position: relative;
+}
+
+.lobby-games {
+  padding: 10px 0px 0px 0px;
+}
+
+.lobby-game {
+  margin-bottom: 20px;
+  padding: 10px 20px 20px 20px;
+}
+
+.lobby-game .game-type {
+  float: left;
+  margin-top: 25px;
+  margin-right: 20px;
+}
+
+.lobby-game .player-joined,
+.lobby-game .player-empty {
+  text-align: center;
+  position: relative;
+  float: left;
+  margin-top: 10px;
+  margin-right: 20px;
+}
+
+.lobby-game .player-name {
+  text-align: center;
+  font-size: 9pt;
+  position: absolute;
+  width: 100px;
+  top: 70px;
+  left: 0px;
+}
