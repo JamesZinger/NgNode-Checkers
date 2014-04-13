@@ -105,6 +105,12 @@
 	},
 	"file_history":
 	[
+		"/C/Development/_GitHub/Projects/Humber/ngnode-checkers/ngnode-checkers.sublime-project",
+		"/C/Development/_GitHub/Projects/Humber/ngnode-checkers/ngnode-checkers.sublime-workspace",
+		"/C/Development/_GitHub/Projects/Humber/ngnode-checkers/package.json",
+		"/C/Development/_GitHub/Projects/Humber/ngnode-checkers/build/New Text Document.txt",
+		"/C/Development/_GitHub/Projects/Humber/ngnode-checkers/AxonCheckersProtocol_1.0.json",
+		"/C/Development/_GitHub/Projects/Humber/ngnode-checkers/7abf94ac-c587-465f-aef2-5c3766332dc6.dmp",
 		"/C/Development/_GitHub/Projects/Humber/ngnode-checkers/.gitignore",
 		"/C/Users/James/Documents/visual studio 2013/Projects/AxonCheckers/AxonCheckers/git-checkers-link/AxonCheckersProtocol_1.0.json",
 		"/C/Users/James/Documents/Mount&Blade Warband Savegames/Prophesy of Pendor 3.611/last_savegame_backup.sav",
@@ -237,7 +243,7 @@
 	{
 		"height": 0.0
 	},
-	"project": "AxonCheckers2.sublime-project",
+	"project": "ngnode-checkers.sublime-project",
 	"replace":
 	{
 		"height": 58.0
