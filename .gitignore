@@ -1,6 +1,12 @@
 # Binary Dumps
 *.dmp
 
+# Compressed Files
+*.zip
+
+# Binary Docuements
+*.docx
+
 # Logs
 logs
 *.log
