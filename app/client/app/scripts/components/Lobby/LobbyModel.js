@@ -26,17 +26,17 @@ app.factory( 'LobbyModel', [
       //
 
       // The lobby player list
-      players = null,
+      players: null,
 
       // The lobby game list
-      games = null,
+      games: null,
 
       // Callback registries for important events
-      registryInitFailed = [],
-      registryInitSuccess = [],
-      registrySetNameFailed = [],
-      registrySetNameSuccess = [],
-      registryStartPlaying = [],
+      registryInitFailed: [],
+      registryInitSuccess: [],
+      registrySetNameFailed: [],
+      registrySetNameSuccess: [],
+      registryStartPlaying: [],
 
       //
       // Init
@@ -333,6 +333,7 @@ app.factory( 'LobbyModel', [
 
             // If this player is the host, cancel the game
             if ( player.name === player.getGameHost() ) {
+              var index = self.indexOfGameByHostPlayerName( player.name );
               self.games.splice( index, 1 );
             }
 
@@ -363,10 +364,10 @@ app.factory( 'LobbyModel', [
             // Update the game using the data package
             var updatedGame = data.data;
             var index = self.indexOfGameByHostPlayerName( hostName );
-            self.games[ index ].players = updatedPlayers.players;
+            self.games[ index ].players = updatedGame.players;
 
             // Update the player state having joined the game
-            player.onCreatedOrJoinedGame( games[ index ] );
+            player.onCreatedOrJoinedGame( self.games[ index ] );
 
           }
 
@@ -389,7 +390,8 @@ app.factory( 'LobbyModel', [
           } else {
 
             // Name change approved
-            self.onSetNameSuccess( player, data.data );
+            var newName = data.data;
+            self.onSetNameSuccess( player, newName );
 
           }
 
@@ -641,7 +643,7 @@ app.factory( 'LobbyModel', [
 
       // onPushStartPlaying() is called when a push notification is received from the server
       // that a the game the player belongs to has begun.
-      onPushStartPlaying: function ( data ) {
+      onPushStartPlaying: function () {
 
         $log.info( 'LobbyModel.onPushStartPlaying()' );
 
@@ -651,7 +653,7 @@ app.factory( 'LobbyModel', [
           self.registryStartPlaying[ i ]();
         }
 
-      }
+      },
 
       //
       // Utility Functions

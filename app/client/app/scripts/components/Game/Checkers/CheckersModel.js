@@ -53,7 +53,7 @@ app.factory( 'CheckersModel', [
       PIECE_MOVE_ANIM_DURATION: 1.0, // seconds
       PIECE_MOVE_ANIM_DELAY: 0.5, // seconds
 
-      POSSIBLE_MOVES = [ {
+      POSSIBLE_MOVES: [ {
         x: 1,
         y: 1
       }, {
@@ -79,29 +79,29 @@ app.factory( 'CheckersModel', [
 
       // This object is used to store a hashmap of pieces to look them up by their IDs.
       // Note: This must be built by the client when the server initialized the board.
-      pieces = {},
+      pieces: null,
 
       // Pieces that are killed are removed from the board and added to this data 
       // structure so that killed pieces can be rendered to the side of the board as 
       // though they were physically removed from the game.
-      deadPieces = [
+      deadPieces: [
         [], // Black pieces (index 0 = PLAYER_COLOUR_BLACK)
         [] // Red pieces (index 1 = PLAYER_COLOUR_RED)
       ],
 
       // The attached player's piece colour within the game.
       // Note: Initialized by the game server (onPushStartPlaying).
-      playerColour: PLAYER_COLOUR_NEITHER,
+      playerColour: self.PLAYER_COLOUR_NEITHER,
 
       // The player colour whose turn is currently is (who is allowed to perform moves).
       // Note: Initialized by the game server (onPushStartPlaying).
-      turn: PLAYER_COLOUR_NEITHER,
+      turn: self.PLAYER_COLOUR_NEITHER,
 
       // Is the game been decided yet?
       gameOver: false,
 
       // Which player colour won the game?
-      winner: PLAYER_COLOUR_NEITHER,
+      winner: self.PLAYER_COLOUR_NEITHER,
 
       // A queue of piece moves to be animated by the scene. Each piece move will queue
       // an action here to be lerped by the render loop. Once the animation completes,
@@ -294,25 +294,25 @@ app.factory( 'CheckersModel', [
 
       // onPushPieceDead() is called when a push notification is recieved from the
       // server that a piece was jumped and should be removed from play.
-      onPushPieceDead: function () {
+      onPushPieceDead: function ( data ) {
 
         $log.info( 'CheckersModel.onPushPieceDead()' );
 
         // Remove the piece from the board using the data package
         var piece = data.data;
-        removePiece( piece );
+        self.removePiece( piece );
 
       },
 
       // onPushPieceKinged() is called when a push notification is recieved from the
       // server that a piece reached the opposide end of the board and should be kinged.
-      onPushPieceKinged: function () {
+      onPushPieceKinged: function ( data ) {
 
         $log.info( 'CheckersModel.onPushPieceKinged()' );
 
         // King the piece using the data package
         var piece = data.data;
-        kingPiece( piece );
+        self.kingPiece( piece );
 
       },
 
@@ -344,7 +344,7 @@ app.factory( 'CheckersModel', [
         var result = [];
 
         // Get the piece
-        var pieceRef = pieces[ pieceID ];
+        var pieceRef = self.pieces[ pieceID ];
 
         // Throw an exception if no piece exists with the given piece ID
         if ( pieceRef === null ) {
@@ -352,13 +352,13 @@ app.factory( 'CheckersModel', [
         }
 
         // Test each possible move and determine if it is possible.
-        var len = POSSIBLE_MOVES.length;
+        var len = self.POSSIBLE_MOVES.length;
         for ( var i = 0; i < len; i++ ) {
 
           // Compute the board co-ordinates to move to.
           var pos = {
-            x: pieceRef.x + POSSIBLE_MOVES[ i ].x,
-            y: pieceRef.y + POSSIBLE_MOVES[ i ].y
+            x: pieceRef.x + self.POSSIBLE_MOVES[ i ].x,
+            y: pieceRef.y + self.POSSIBLE_MOVES[ i ].y
           };
 
           if ( self.isValidMove( pieceID, pos.x, pos.y ) ) {
@@ -370,8 +370,8 @@ app.factory( 'CheckersModel', [
 
             // Maybe a piece was in this space, so we can check if it is a 
             // valid move to jump it and land in the space on the opposite side.
-            pos.x += POSSIBLE_MOVES[ i ].x;
-            pos.y += POSSIBLE_MOVES[ i ].y;
+            pos.x += self.POSSIBLE_MOVES[ i ].x;
+            pos.y += self.POSSIBLE_MOVES[ i ].y;
 
             if ( self.isValidMove( pieceID, pos.x, pos.y ) ) {
 
@@ -398,7 +398,7 @@ app.factory( 'CheckersModel', [
       isValidMove: function ( pieceID, x, y ) {
 
         // Get the piece
-        var pieceRef = pieces[ pieceID ];
+        var pieceRef = self.pieces[ pieceID ];
 
         // Throw an exception if no piece exists with the given piece ID
         if ( pieceRef === null ) {
@@ -430,12 +430,12 @@ app.factory( 'CheckersModel', [
           // The piece is not being moved diagonally.
           return false;
 
-        } else if ( Math.abs( dx ) === 2 && Math.abs( dx ) === 2 && board[ pieceRef.x + dx / 2 ][ pieceRef.y + dy / 2 ] === null ) {
+        } else if ( Math.abs( dx ) === 2 && Math.abs( dx ) === 2 && self.board[ pieceRef.x + dx / 2 ][ pieceRef.y + dy / 2 ] === null ) {
 
           // The piece is being moved to jump another piece that doesn't exist.
           return false;
 
-        } else if ( board[ x ][ y ] !== null ) {
+        } else if ( self.board[ x ][ y ] !== null ) {
 
           // There is a piece in the target space.
           return false;
@@ -452,7 +452,7 @@ app.factory( 'CheckersModel', [
         self.parentElement = parentElement;
         self.parentElement.append( self.renderer.domElement );
 
-      };
+      }
 
     };
 

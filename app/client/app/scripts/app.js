@@ -18,8 +18,10 @@ app.config( function ( $routeProvider ) {
 
   $routeProvider
     .when( '/', {
-      templateUrl: 'views/main.html',
-      controller: 'MainController'
+      redirectTo: '/home'
+    } )
+    .when( '/404', {
+      templateUrl: 'views/404.html'
     } )
     .when( '/home', {
       templateUrl: 'views/home.html',
