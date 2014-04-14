@@ -36,7 +36,7 @@
         <ul class="nav navbar-nav">
           <li id="nav-home" class="active"><a href="#home">Home</a></li>
           <li id="nav-lobby"><a href="#lobby">Lobby</a></li>
-          <li id="nav-play"><a href="#play">Play</a></li>
+          <li id="nav-game"><a href="#game">Play</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
@@ -66,17 +66,18 @@
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:js({.tmp,app}) scripts/scripts.js -->
-  <script src="scripts/polyfill.js"></script>
+  <script src="scripts/include/polyfill.js"></script>
   <script src="scripts/app.js"></script>
-  <script src="scripts/controllers/MainController.js"></script>
-  <script src="scripts/controllers/HomeController.js"></script>
-  <script src="scripts/controllers/LobbyController.js"></script>
-  <script src="scripts/controllers/GameplayController.js"></script>
-  <script src="scripts/services/factories/Socket.js"></script>
-  <script src="scripts/services/factories/LobbyProtocol.js"></script>
-  <script src="scripts/services/factories/CheckersProtocol.js"></script>
-  <script src="scripts/services/factories/LobbyModel.js"></script>
-  <script src="scripts/services/factories/PlayerModel.js"></script>
+  <script src="scripts/components/MainController.js"></script>
+  <script src="scripts/components/Socket/Socket.js"></script>
+  <script src="scripts/components/Home/HomeController.js"></script>
+  <script src="scripts/components/Player/PlayerModel.js"></script>
+  <script src="scripts/components/Lobby/LobbyController.js"></script>
+  <script src="scripts/components/Lobby/LobbyProtocol.js"></script>
+  <script src="scripts/components/Lobby/LobbyModel.js"></script>
+  <script src="scripts/components/Game/GameController.js"></script>
+  <script src="scripts/components/Game/Checkers/CheckersProtocol.js"></script>
+  <script src="scripts/components/Game/Checkers/CheckersModel.js"></script>
   <!-- endbuild -->
 </body>
 </html>

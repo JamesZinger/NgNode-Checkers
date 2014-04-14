@@ -29,29 +29,37 @@ app.config( function ( $routeProvider ) {
       templateUrl: 'views/lobby.html',
       controller: 'LobbyController'
     } )
-    .when( '/play', {
-      templateUrl: 'views/play.html',
-      controller: 'PlayController'
+    .when( '/game', {
+      templateUrl: 'views/game.html',
+      controller: 'GameController'
     } )
     .otherwise( {
       redirectTo: '/404'
     } );
 
-} )
-  .animation( '.reveal-animation', function () {
-    return {
-      enter: function ( element, done ) {
-        element.css( 'display', 'none' );
-        element.fadeIn( 500, done );
-        return function () {
-          element.stop();
-        };
-      },
-      leave: function ( element, done ) {
-        element.fadeOut( 500, done );
-        return function () {
-          element.stop();
-        };
-      }
-    };
-  } );
+} ).animation( '.reveal-animation', function () {
+
+  return {
+
+    enter: function ( element, done ) {
+
+      element.css( 'display', 'none' );
+      element.fadeIn( 500, done );
+      return function () {
+        element.stop();
+      };
+
+    },
+
+    leave: function ( element, done ) {
+
+      element.fadeOut( 500, done );
+      return function () {
+        element.stop();
+      };
+
+    }
+
+  };
+
+} );

@@ -4,22 +4,8 @@
 app.factory( 'LobbyModel', [ 'LobbyProtocol', 
   function ( $log ) {
 
-    // init() will be called just prior to returning the lobby model object.
-    function init() {
-
-      // Register event listeners for push notifications from the server
-      LobbyProtocol.registerToGameCreate( lobbyModel.onPushGameCreate );
-      LobbyProtocol.registerToGameRemove( lobbyModel.onPushGameRemove );
-      LobbyProtocol.registerToGameUpdate( lobbyModel.onPushGameUpdate );
-      LobbyProtocol.registerToPlayerCreate( lobbyModel.onPushPlayerCreate );
-      LobbyProtocol.registerToPlayerRemove( lobbyModel.onPushPlayerRemove );
-      LobbyProtocol.registerToPlayerUpdate( lobbyModel.onPushPlayerUpdate );
-      LobbyProtocol.registerToStartPlaying( lobbyModel.onPushStartPlaying );
-
-    }
-
     // Create the lobby model object
-    var lobbyModel = {
+    var self = {
 
       //
       // Constants
@@ -52,30 +38,50 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       registryStartPlaying = [],
 
       //
+      // Init
+      //
+
+      // init() initializes the that of the lobby model so it is ready to use.
+      init: function () {
+
+        $log.info( 'LobbyModel.init()' );
+
+        // Register event listeners for push notifications from the server
+        LobbyProtocol.registerToGameCreate( self.onPushGameCreate );
+        LobbyProtocol.registerToGameRemove( self.onPushGameRemove );
+        LobbyProtocol.registerToGameUpdate( self.onPushGameUpdate );
+        LobbyProtocol.registerToPlayerCreate( self.onPushPlayerCreate );
+        LobbyProtocol.registerToPlayerRemove( self.onPushPlayerRemove );
+        LobbyProtocol.registerToPlayerUpdate( self.onPushPlayerUpdate );
+        LobbyProtocol.registerToStartPlaying( self.onPushStartPlaying );
+
+      },
+
+      //
       // Callback Regisitration
       //
 
-      // addEventListener() is a convenience function to provide a more traditional way of hooking
-      // into the observer pattern for listening to events.
+      // addEventListener() is a convenience function to provide a more traditional way of 
+      // hooking into the observer pattern for listening to events.
       // Note: The callback must be of the form: function ( data ) { ... }
       addEventListener: function ( eventType, callback ) {
 
         switch ( eventType ) {
 
-        case lobbyModel.EVENT_INIT_FAILED:
-          lobbyModel.registerFromInitFailed( callback );
+        case self.EVENT_INIT_FAILED:
+          self.registerFromInitFailed( callback );
           break;
-        case lobbyModel.EVENT_INIT_SUCCESS:
-          lobbyModel.registerFromInitSuccess( callback );
+        case self.EVENT_INIT_SUCCESS:
+          self.registerFromInitSuccess( callback );
           break;
-        case lobbyModel.EVENT_SET_NAME_FAILED:
-          lobbyModel.registerFromSetNameFailed( callback );
+        case self.EVENT_SET_NAME_FAILED:
+          self.registerFromSetNameFailed( callback );
           break;
-        case lobbyModel.EVENT_SET_NAME_SUCCESS:
-          lobbyModel.registerFromSetNameSuccess( callback );
+        case self.EVENT_SET_NAME_SUCCESS:
+          self.registerFromSetNameSuccess( callback );
           break;
-        case lobbyModel.EVENT_START_PLAYING:
-          lobbyModel.registerFromStartPlaying( callback );
+        case self.EVENT_START_PLAYING:
+          self.registerFromStartPlaying( callback );
           break;
         default:
           throw 'LobbyModel.addEventListener >> Cannot register to this eventType. Unknown eventType!';
@@ -89,9 +95,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // Note: The callback must be of the form: function ( data ) { ... }
       registerFromInitFailed: function ( callback ) {
 
-        var index = lobbyProtocol.registryInitFailed.indexOf( callback );
+        var index = self.registryInitFailed.indexOf( callback );
         if ( index < 0 ) {
-          lobbyProtocol.registryInitFailed.push( callback );
+          self.registryInitFailed.push( callback );
         }
 
       },
@@ -101,9 +107,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // Note: The callback must be of the form: function ( data ) { ... }
       registerFromInitSuccess: function ( callback ) {
 
-        var index = lobbyProtocol.registryInitSuccess.indexOf( callback );
+        var index = self.registryInitSuccess.indexOf( callback );
         if ( index < 0 ) {
-          lobbyProtocol.registryInitSuccess.push( callback );
+          self.registryInitSuccess.push( callback );
         }
 
       },
@@ -113,9 +119,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // Note: The callback must be of the form: function ( data ) { ... }
       registerFromSetNameFailed: function ( callback ) {
 
-        var index = lobbyProtocol.registrySetNameFailed.indexOf( callback );
+        var index = self.registrySetNameFailed.indexOf( callback );
         if ( index < 0 ) {
-          lobbyProtocol.registrySetNameFailed.push( callback );
+          self.registrySetNameFailed.push( callback );
         }
 
       },
@@ -125,9 +131,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // Note: The callback must be of the form: function ( data ) { ... }
       registerFromSetNameSuccess: function ( callback ) {
 
-        var index = lobbyProtocol.registrySetNameSuccess.indexOf( callback );
+        var index = self.registrySetNameSuccess.indexOf( callback );
         if ( index < 0 ) {
-          lobbyProtocol.registrySetNameSuccess.push( callback );
+          self.registrySetNameSuccess.push( callback );
         }
 
       },
@@ -137,9 +143,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // Note: The callback must be of the form: function ( data ) { ... }
       registerFromStartPlaying: function ( callback ) {
 
-        var index = lobbyProtocol.registryStartPlaying.indexOf( callback );
+        var index = self.registryStartPlaying.indexOf( callback );
         if ( index < 0 ) {
-          lobbyProtocol.registryStartPlaying.push( callback );
+          self.registryStartPlaying.push( callback );
         }
 
       },
@@ -155,20 +161,20 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
         switch ( eventType ) {
 
-        case lobbyModel.EVENT_INIT_FAILED:
-          lobbyModel.deregisterFromInitFailed( callback );
+        case self.EVENT_INIT_FAILED:
+          self.deregisterFromInitFailed( callback );
           break;
-        case lobbyModel.EVENT_INIT_SUCCESS:
-          lobbyModel.deregisterFromInitSuccess( callback );
+        case self.EVENT_INIT_SUCCESS:
+          self.deregisterFromInitSuccess( callback );
           break;
-        case lobbyModel.EVENT_SET_NAME_FAILED:
-          lobbyModel.deregisterFromSetNameFailed( callback );
+        case self.EVENT_SET_NAME_FAILED:
+          self.deregisterFromSetNameFailed( callback );
           break;
-        case lobbyModel.EVENT_SET_NAME_SUCCESS:
-          lobbyModel.deregisterFromSetNameSuccess( callback );
+        case self.EVENT_SET_NAME_SUCCESS:
+          self.deregisterFromSetNameSuccess( callback );
           break;
-        case lobbyModel.EVENT_START_PLAYING:
-          lobbyModel.deregisterFromStartPlaying( callback );
+        case self.EVENT_START_PLAYING:
+          self.deregisterFromStartPlaying( callback );
           break;
         default:
           throw 'LobbyModel.removeEventListener >> Cannot deregister from this eventType. Unknown eventType!';
@@ -181,9 +187,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // EVENT_INIT_FAILED event.
       deregisterFromInitFailed: function ( callback ) {
 
-        var index = lobbyModel.registryInitFailed.indexOf( callback );
+        var index = self.registryInitFailed.indexOf( callback );
         if ( index > 0 ) {
-          lobbyModel.registryInitFailed.push( callback );
+          self.registryInitFailed.push( callback );
         }
 
       },
@@ -192,9 +198,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // EVENT_INIT_SUCCESS event.
       deregisterFromInitSuccess: function ( callback ) {
 
-        var index = lobbyModel.registryInitSuccess.indexOf( callback );
+        var index = self.registryInitSuccess.indexOf( callback );
         if ( index > 0 ) {
-          lobbyModel.registryInitSuccess.push( callback );
+          self.registryInitSuccess.push( callback );
         }
 
       },
@@ -203,9 +209,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // EVENT_SET_NAME_FAILED event.
       deregisterFromSetNameFailed: function ( callback ) {
 
-        var index = lobbyModel.registrySetNameFailed.indexOf( callback );
+        var index = self.registrySetNameFailed.indexOf( callback );
         if ( index > 0 ) {
-          lobbyModel.registrySetNameFailed.push( callback );
+          self.registrySetNameFailed.push( callback );
         }
 
       },
@@ -214,9 +220,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // EVENT_SET_NAME_SUCCESS event.
       deregisterFromSetNameSuccess: function ( callback ) {
 
-        var index = lobbyModel.registrySetNameSuccess.indexOf( callback );
+        var index = self.registrySetNameSuccess.indexOf( callback );
         if ( index > 0 ) {
-          lobbyModel.registrySetNameSuccess.push( callback );
+          self.registrySetNameSuccess.push( callback );
         }
 
       },
@@ -225,9 +231,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       // EVENT_START_PLAYING event.
       deregisterFromStartPlaying: function ( callback ) {
 
-        var index = lobbyModel.registryStartPlaying.indexOf( callback );
+        var index = self.registryStartPlaying.indexOf( callback );
         if ( index > 0 ) {
-          lobbyModel.registryStartPlaying.push( callback );
+          self.registryStartPlaying.push( callback );
         }
 
       },
@@ -246,15 +252,15 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
           // Retry calling requestInit() after a delay
           function tryAgain() {
-            setTimeout( lobbyModel.INIT_ATTEMPTS_DELAY, function () {
-              lobbyModel.requestInit();
+            setTimeout( self.INIT_ATTEMPTS_DELAY, function () {
+              self.requestInit();
             } );
           }
 
           // Check for success to throw the appropriate events in response to the init response
           if ( !data || !data.approved ) {
 
-            if ( lobbyModel.initAttempts++ < lobbyModel.INIT_ATTEMPTS_MAX ) {
+            if ( self.initAttempts++ < self.INIT_ATTEMPTS_MAX ) {
 
               // Init attempts remain -- Keep trying
               tryAgain();
@@ -262,14 +268,14 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
             } else {
 
               // Out of attempts -- Init has failed
-              lobbyModel.onInitFailed();
+              self.onInitFailed();
 
             }
 
           } else {
 
             // Init was successful
-            lobbyModel.onInitSuccess( player, data );
+            self.onInitSuccess( player, data );
 
           }
 
@@ -293,7 +299,11 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
           } else {
 
             // Create a new game using the data package
-            games.push( data.data );
+            var createdGame = data.data;
+            self.games.push( createdGame );
+
+            // Update the player state having created the game
+            player.onCreatedOrJoinedGame( createdGame );
 
           }
 
@@ -319,13 +329,11 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
             // If this player is the host, cancel the game
             if ( player.name === player.getGameHost() ) {
-              games.splice( index, 1 );
+              self.games.splice( index, 1 );
             }
 
-            // Update the player state to have left the game
-            player.leaveGame();
-            //player.gameLobby = null;
-            //player.state = 'Available';
+            // Update the player state having left the game
+            player.onLeftGame();
 
           }
 
@@ -349,13 +357,12 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
           } else {
 
             // Update the game using the data package
-            var index = lobyyModel.indexOfGameByHostPlayerName( hostName );
-            games[ index ].players = data.data.players;
+            var updatedGame = data.data;
+            var index = self.indexOfGameByHostPlayerName( hostName );
+            self.games[ index ].players = updatedPlayers.players;
 
-            // Update the player state to have joined the game
-            player.joinGame( games[ index ] );
-            //player.gameLobby = games[ index ];
-            //player.state = 'Playing';
+            // Update the player state having joined the game
+            player.onCreatedOrJoinedGame( games[ index ] );
 
           }
 
@@ -373,12 +380,12 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
           if ( !data || !data.approved ) {
 
             // Name change failed/denied
-            lobbyModel.onSetNameFailed();
+            self.onSetNameFailed();
 
           } else {
 
             // Name change approved
-            lobbyModel.onSetNameSuccess( player, data.data );
+            self.onSetNameSuccess( player, data.data );
 
           }
 
@@ -401,7 +408,7 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
           } else {
 
             // Set the player's readiness in the game to which they belong
-            player.setReady();
+            player.onSetReady();
 
           }
 
@@ -424,7 +431,7 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
           } else {
 
             // Set the player's readiness in the game to which they belong
-            player.setWaiting();
+            player.onSetWaiting();
 
           }
 
@@ -443,9 +450,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
         $log.error( 'LobbyModel.onInitFailed()' );
 
         // Call each of the functions registered as listeners for this event
-        var len = lobbyModel.registryInitFailed.length;
+        var len = self.registryInitFailed.length;
         for ( var i = 0; i < len; i++ ) {
-          lobbyModel.registryInitFailed[ i ]();
+          self.registryInitFailed[ i ]();
         }
 
       },
@@ -456,17 +463,15 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
         $log.info( 'LobbyModel.onInitSuccess()' );
 
-        // Give the player an initial name
-        player.name = data.data.initialPlayerName;
-
         // Use the players and games arrays sent from the server
-        players = data.data.players;
-        games = data.data.games;
+        var initialLobbyState = data.data;
+        self.players = initialLobbyState.players;
+        self.games = initialLobbyState.games;
 
         // Call each of the functions registered as listeners for this event
-        var len = lobbyModel.registryInitSuccess.length;
+        var len = self.registryInitSuccess.length;
         for ( var i = 0; i < len; i++ ) {
-          lobbyModel.registryInitSuccess[ i ]();
+          self.registryInitSuccess[ i ]();
         }
 
       },
@@ -479,9 +484,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
         $log.info( 'LobbyModel.onSetNameFailed()' );
 
         // Call each of the functions registered as listeners for this event
-        var len = lobbyModel.registrySetNameFailed.length;
+        var len = self.registrySetNameFailed.length;
         for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registrySetNameFailed[ i ]();
+          self.registrySetNameFailed[ i ]();
         }
 
       },
@@ -493,144 +498,153 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
         $log.info( 'LobbyModel.onSetNameSuccess()' );
 
         // Change the player's name
-        player.name = newName;
+        player.onSetName( newName );
 
         // Call each of the functions registered as listeners for this event
-        var len = lobbyModel.registrySetNameSuccess.length;
+        var len = self.registrySetNameSuccess.length;
         for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registrySetNameSuccess[ i ]();
+          self.registrySetNameSuccess[ i ]();
         }
 
       },
 
       // onPushGameCreate() is called when a push notification is received from the server
       // that a game should be created using the provided data package.
-      // Note: Push notifications don't require verification of approval!
       onPushGameCreate: function ( data ) {
 
         $log.info( 'LobbyModel.onPushGameCreate()' );
 
+        // The data package contains the created game.
+        var createdGame = data.data;
+
         // Search for and remove any other games with this player as host. If any others 
         // exist then they are errors and it's time to fix the problem.
         while ( true ) {
-          var index = lobbyModel.indexOfGameByHostPlayerName( data.data.players[ 0 ].name );
+          var index = self.indexOfGameByHostPlayerName( createdGame.players[ 0 ].name );
           if ( index === -1 ) {
             break;
           }
           $log.warn( 'LobbyModel.onPushGameCreate() >> Host player already is hosting another game! Removing game...' );
-          games.splice( index, 1 );
+          self.games.splice( index, 1 );
         }
 
         // Add the created game to the lobby games list.
-        games.push( data.data );
+        self.games.push( createdGame );
 
       },
 
       // onPushGameRemove() is called when a push notification is received from the server
       // that the game with the host player named in the data package should be removed.
-      // Note: Push notifications don't require verification of approval!
       onPushGameRemove: function ( data ) {
 
         $log.info( 'LobbyModel.onPushGameRemove()' );
 
+        // The data package contains the name of the player whose game should be removed.
+        var gameHostToRemove = data.data;
+
         // Search for and remove any games with this player as host.
         while ( true ) {
-          var index = lobbyModel.indexOfGameByHostPlayerName( data.data );
+          var index = self.indexOfGameByHostPlayerName( gameHostToRemove );
           if ( index === -1 ) {
             break;
           }
           $log.info( 'LobbyModel.onPushGameRemove() >> Removing game...' );
-          games.splice( index, 1 );
+          self.games.splice( index, 1 );
         }
 
       },
 
       // onPushGameUpdate() is called when a push notification is received from the server
       // that a game should be overwritten using the data package provided.
-      // Note: Push notifications don't require verification of approval!
       onPushGameUpdate: function ( data ) {
 
         $log.info( 'LobbyModel.onPushGameUpdate()' );
 
+        // The data package contains the updated game.
+        var updatedGame = data.data;
+
         // Search for the game to update.
-        var index = lobbyModel.indexOfGameByHostPlayerName( data.data.players[ 0 ].name );
+        var index = self.indexOfGameByHostPlayerName( updatedGame.players[ 0 ].name );
 
         // Update the game's members using the data package.
-        $log.info( 'LobbyModel.onPushGameUpdate() >> Updating game...' );
-        games[ index ].players = data.data.players;
+        self.games[ index ].players = updatedGame.players;
 
       },
 
       // onPushPlayerCreate() is called when a push notification is received from the server
       // that a player should be created using the provided data package.
-      // Note: Push notifications don't require verification of approval!
       onPushPlayerCreate: function ( data ) {
 
         $log.info( 'LobbyModel.onPushPlayerCreate()' );
 
+        // The data package contains the created player.
+        var createdPlayer = data.data;
+
         // Search for players with the same name. If another is found it is an error and 
         // should be removed.
         while ( true ) {
-          var index = lobbyModel.indexOfPlayerByName( data.data.name );
+          var index = self.indexOfPlayerByName( createdPlayer.name );
           if ( index === -1 ) {
             break;
           }
           $log.warn( 'LobbyModel.onPushPlayerCreate() >> Player already exists! Removing player...' );
-          players.splice( index, 1 );
+          self.players.splice( index, 1 );
         }
 
         // Add the created player to the lobby players list.
-        games.push( data.data );
+        self.players.push( createdPlayer );
 
       },
 
       // onPushPlayerRemove() is called when a push notification is received from the server
       // that the player named in the data package should be removed.
-      // Note: Push notifications don't require verification of approval!
       onPushPlayerRemove: function ( data ) {
 
         $log.info( 'LobbyModel.onPushPlayerRemove()' );
 
+        // The data package contains the name of the player to remove.
+        var playerToRemove = data.data;
+
         // Search for and remove any players with this name.
         while ( true ) {
-          var index = lobbyModel.indexOfPlayerByName( data.data );
+          var index = self.indexOfPlayerByName( playerToRemove );
           if ( index === -1 ) {
             break;
           }
           $log.info( 'LobbyModel.onPushPlayerRemove() >> Removing game...' );
-          players.splice( index, 1 );
+         self. players.splice( index, 1 );
         }
 
       },
 
       // onPushPlayerUpdate() is called when a push notification is received from the server
       // that a player should be overwritten with the data package provided.
-      // Note: Push notifications don't require verification of approval!
       onPushPlayerUpdate: function ( data ) {
 
         $log.info( 'LobbyModel.onPushPlayerUpdate()' );
 
+        // The data package contains the updated player
+        var updatedPlayer = data.data;
+
         // Search for the player to update.
-        var index = lobbyModel.indexOfPlayerByName( data.data.name );
+        var index = self.indexOfPlayerByName( updatedPlayer.name );
 
         // Update the player's members using the data package.
-        $log.info( 'LobbyModel.onPushPlayerUpdate() >> Updating player...' );
-        players[ index ].name = data.data.name;
-        players[ index ].state = data.data.state;
+        self.players[ index ].name = updatedPlayer.name;
+        self.players[ index ].state = updatedPlayer.state;
 
       },
 
       // onPushStartPlaying() is called when a push notification is received from the server
       // that a the game the player belongs to has begun.
-      // Note: Push notifications don't require verification of approval!
       onPushStartPlaying: function ( data ) {
 
         $log.info( 'LobbyModel.onPushStartPlaying()' );
 
         // Call each of the functions registered as listeners for this event
-        var len = lobbyModel.registryStartPlaying.length;
+        var len = self.registryStartPlaying.length;
         for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryStartPlaying[ i ]();
+          self.registryStartPlaying[ i ]();
         }
 
       }
@@ -645,9 +659,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       indexOfGameByHostPlayerName: function ( name ) {
 
         // Perform a linear search for the game with the host player to match the data package
-        var len = games.length;
+        var len = self.games.length;
         for ( var i = 0; i < len; i++ ) {
-          if ( name === games[ i ].players[ 0 ].name ) {
+          if ( name === self.games[ i ].players[ 0 ].name ) {
             return i;
           }
         }
@@ -661,9 +675,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       indexOfPlayerByName: function ( name ) {
 
         // Perform a linear search for the game with the host player to match the data package
-        var len = players.length;
+        var len = self.players.length;
         for ( var i = 0; i < len; i++ ) {
-          if ( name === players[ i ].name ) {
+          if ( name === self.players[ i ].name ) {
             return i;
           }
         }
@@ -674,8 +688,8 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
     };
 
     // Init and retutrn
-    init();
-    return lobbyModel;
+    self.init();
+    return self;
 
   }
 
