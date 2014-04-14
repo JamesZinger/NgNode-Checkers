@@ -1,6 +1,5 @@
 /* global require:false,
 	exports:false */
-'use strict';
 var cl_template = require('./client.js');
 var game_template = require('./../Game/checkers.js');
 var Clients = [];
@@ -95,21 +94,87 @@ exports.GetClients = function()
 
 function createGame(clientContext)
 {
+	//Check if the player is already in a game
+	if (clientContext.isInGame === true)
+	{
+		return {
+			approved: false,
+			data: "Cannot create a game if you are in a game"
+		};
+	}
 
+	//Check if the play has a name 
+	if('undefined' == typeof clientContext.name || clientContext.name === null)
+	{
+		return {
+			approved: false,
+			data: "Cannot create a game. client name is invaild"
+		};
+	}
+
+	game_template.CreateGame(clientContext);
 }
 
 function leaveGame(clientContext)
 {
+	if(clientContext.isInGame === false)
+	{
+		return{
+			approved: false,
+			data: "Cannot leave a game if you are not in a game"
+		};
+	}
 
+	if ('undefined' == typeof clientContext.name || clientContext.name === null)
+	{
+		return {
+			approved: false,
+			data: "Cannot leave game. client name is invaild"
+		};
+	}
+
+	//Leave the game
 }
 
 function joinGame(clientContext)
 {
+	if (clientContext.isInGame === true)
+	{
+		return {
+			approved: false,
+			data: "Cannot join a game if you are in a game"
+		};
+	}
+
+	if ('undefined' == typeof clientContext.name || clientContext.name === null)
+	{
+		return{
+			approved: false,
+			data: "Cannot join a game if you do not have a name"
+		};
+	}
+
 
 }
 
 function setReady(clientContext)
 {
+	if (clientContext.isInGame === false)
+	{
+		return{
+			approved: false,
+			data: "Cannot ready whne you are not in a game"
+		};
+	}
+
+	if ('undefined' == typeof clientContext.name || clientContext.name === null)
+	{
+		return {
+			approved: false,
+			data: "Cannot ready if you do not have a name"
+		};
+	}
+
 
 }
 
@@ -120,5 +185,13 @@ function setWait(clientContext)
 
 function setName(clientContext)
 {
+	if (clientContext.isInGame === true)
+	{
+		return {
+			approved: false,
+			data: "Cannot change your name if you are in a game"
+		};
+	}
 
+	//Change the name
 }
