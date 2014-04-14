@@ -5,6 +5,39 @@
 app.factory( 'CheckersModel', [ 'CheckersProtocol',
   function ( $log ) {
 
+    // *** Polyfill ***
+    // Provides browser support for requestAnimationFrame() since THREE considers
+    // requestAnimationFrame() best-practice for running the render loop. Also has
+    // a fallback to use setTimeout if no other option is available.
+    // Source: http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
+    window.requestAnimFrame = ( function () {
+
+      return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function ( callback ) {
+          window.setTimeout( callback, 1000 / 60 );
+      };
+
+    } )();
+
+    // Constructor for the hashmap of pieces
+    function Pieces( board ) {
+
+      // Seek through the board, adding pieces to the map by their IDs
+      for ( var row = 0; row < 8; row++ ) {
+        for ( var col = 0; col < 8; col++ ) {
+          var piece = board[ row ][ col ];
+          if ( piece === null ) {
+            continue;
+          } else {
+            this[ piece.id ] = piece;
+          }
+        }
+      }
+
+    }
+
     // Create the checkers model object
     var self = {
 
@@ -12,18 +45,79 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
       // Constants
       //
 
+      PLAYER_COLOUR_NEITHER: -1,
+      PLAYER_COLOUR_BLACK: 0,
+      PLAYER_COLOUR_RED: 1,
 
+      PIECE_MOVE_ANIM_DURATION: 1.0, // seconds
+      PIECE_MOVE_ANIM_DELAY: 0.5, // seconds
+
+      POSSIBLE_MOVES = [ {
+        x: 1,
+        y: 1
+      }, {
+        x: -1,
+        y: 1
+      }, {
+        x: -1,
+        y: -1
+      }, {
+        x: 1,
+        y: -1
+      } ],
 
       //
       // Member Variables
       //
 
+      // The data structure that makes up the state of the checkers game board.
+      // Game pieces are attached to cells of a 2D array to indicate their positions,
+      // states, and player ownership.
+      // Note: Initialized by the game server (onPushStartPlaying).
+      board: null, 
 
+      // This object is used to store a hashmap of pieces to look them up by their IDs.
+      // Note: This must be built by the client when the server initialized the board.
+      pieces = {},
 
+      // Pieces that are killed are removed from the board and added to this data 
+      // structure so that killed pieces can be rendered to the side of the board as 
+      // though they were physically removed from the game.
+      deadPieces = [
+        [], // Black pieces (index 0 = PLAYER_COLOUR_BLACK)
+        [] // Red pieces (index 1 = PLAYER_COLOUR_RED)
+      ],
+
+      // The attached player's piece colour within the game.
+      // Note: Initialized by the game server (onPushStartPlaying).
+      playerColour: PLAYER_COLOUR_NEITHER,
+
+      // The player colour whose turn is currently is (who is allowed to perform moves).
+      // Note: Initialized by the game server (onPushStartPlaying).
+      turn: PLAYER_COLOUR_NEITHER,
+
+      // Is the game been decided yet?
+      gameOver: false,
+
+      // Which player colour won the game?
+      winner: PLAYER_COLOUR_NEITHER,
+
+      // A queue of piece moves to be animated by the scene. Each piece move will queue
+      // an action here to be lerped by the render loop. Once the animation completes,
+      // it will be removed from the queue, and the next one will begin. All player actions
+      // will be ignored until the animationQueue is empty.
+      animationQueue: [],
+
+      // The parent DOM element to which the THREE renderer is attached.
       parentElement: null,
 
+      // The THREE scene that contains the 3D models.
       scene: null,
+
+      // The THREE camera within the scene.
       camera: null,
+
+      // The THREE renderer that draws the camera's view to the DOM.
       renderer: null,
 
       cube: null,
@@ -33,22 +127,9 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
       //
 
       // init() configures the checkers model so it is ready to use.
-      init: function ( height, width, parentElement ) {
+      init: function ( gameState, sceneHeight, sceneWidth, parentElement ) {
 
         $log.info( 'CheckersModel.init()' );
-
-        // Provides browser support for requestAnimationFrame() since THREE considers
-        // requestAnimationFrame() best-practice for running the render loop. Also has
-        // a fallback to use setTimeout if no other option is available.
-        // Source: http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
-        window.requestAnimFrame = ( function () {
-          return window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            function ( callback ) {
-              window.setTimeout( callback, 1000 / 60 );
-          };
-        } )();
 
         // Register event listeners for push notifications from the server
         CheckersProtocol.registerToBeginTurn( self.onPushBeginTurn );
@@ -57,8 +138,16 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
         CheckersProtocol.registerToPieceKinged( self.onPushPieceKinged );
         CheckersProtocol.registerToPiecePositioned( self.onPushPiecePositioned );
 
+        // Read in the game state
+        self.board = gameState.board;
+        self.playerColour = gameState.playerColour;
+        self.turn = gameState.turn;
+
+        // Build the pieces hashmap using the board state
+        self.pieces = new Pieces( gameState.board );
+
         // Configure the scene
-        self.initScene( height, width );
+        self.initScene( sceneHeight, sceneWidth );
 
         // Append this to a parent element
         self.setParent( parentElement );
@@ -142,7 +231,26 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
 
         $log.info( 'CheckersModel.requestMovePiece()' );
 
+        CheckersProtocol.requestMovePiece( self, piece, x, y, function ( data ) {
 
+          if ( !data || !data.approved ) {
+
+            // Do nothing?
+            var errorMessage = data.data;
+            $log.warn( 'CheckersModel.requestMovePiece() >> FAILED/DENIED! ' + errorMessage );
+
+          } else {
+
+            // Push the move onto the animationQueue to be handled by the render loop
+            self.animationQueue.push( {
+              piece: piece,
+              x: x,
+              y: y
+            } );
+
+          }
+
+        } );
 
       },
 
@@ -150,53 +258,76 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
       // Event Handlers
       //
 
-      // onPushBeginTurn() is called when a push notifiecation is recieved from the
+      // onPushBeginTurn() is called when a push notification is recieved from the
       // server that a player's turn has begun, so the turn state should be set.
       onPushBeginTurn: function () {
 
         $log.info( 'CheckersModel.onPushBeginTurn()' );
 
+        // Cancel any actions in progress right then
+        // TODO
 
+        // Remember to allow the animationQueue to empty before the player takes action
+        // TODO
+
+        // Set the player turn using the data package
+        var turn = data.data;
+        self.playerTurn = turn;
 
       },
 
-      // onPushGameOver() is called when a push notifiecation is recieved from the
+      // onPushGameOver() is called when a push notification is recieved from the
       // server that the game is over and one of the two players has won.
-      onPushGameOver: function () {
+      onPushGameOver: function ( data ) {
 
         $log.info( 'CheckersModel.onPushGameOver()' );
 
+        // Set the winner using the data package
+        var winner = data.data;
+        self.winner = winner;
 
+        // Flag the game as over
+        self.gameOver = true;
 
       },
 
-      // onPushPieceDead() is called when a push notifiecation is recieved from the
+      // onPushPieceDead() is called when a push notification is recieved from the
       // server that a piece was jumped and should be removed from play.
       onPushPieceDead: function () {
 
         $log.info( 'CheckersModel.onPushPieceDead()' );
 
-
+        // Remove the piece from the board using the data package
+        var piece = data.data;
+        removePiece( piece );
 
       },
 
-      // onPushPieceKinged() is called when a push notifiecation is recieved from the
+      // onPushPieceKinged() is called when a push notification is recieved from the
       // server that a piece reached the opposide end of the board and should be kinged.
       onPushPieceKinged: function () {
 
         $log.info( 'CheckersModel.onPushPieceKinged()' );
 
-
+        // King the piece using the data package
+        var piece = data.data;
+        kingPiece( piece );
 
       },
 
-      // onPushPiecePositioned() is called when a push notifiecation is recieved from 
+      // onPushPiecePositioned() is called when a push notification is recieved from 
       // the server that a piece on the board has been repositioned and should be moved.
-      onPushPiecePositioned: function () {
+      onPushPiecePositioned: function ( data ) {
 
         $log.info( 'CheckersModel.onPushPiecePositioned()' );
 
-
+        // Push the move onto the animationQueue to be handled by the render loop
+        var moveData = data.data;
+        self.animationQueue.push( {
+          piece: moveData.piece,
+          x: moveData.x,
+          y: moveData.y
+        } );
 
       },
 
@@ -204,6 +335,85 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
       // Utility Functions
       //
 
+      // getValidMoves() returns an array of up to 4 potential moves that are valid 
+      // for the piece with the given piece ID. If not valid moves are available, an 
+      // empty array is returned.
+      getValidMoves: function ( pieceID ) {
+
+        var result = [];
+
+        // Get the piece
+        var pieceRef = pieces[ pieceID ];
+
+        // Throw an exception if no piece exists with the given piece ID
+        if ( pieceRef === null ) {
+          throw 'CheckersModel.getValidMovesForPiece() >> Cannot get valid moves. Invalid piece ID!';
+        }
+
+        // Test each possible move and determine if it is possible.
+        var len = POSSIBLE_MOVES.length;
+        for ( var i = 0; i < len; i++ ) {
+
+          // Compute the board co-ordinates to move to.
+          var pos = {
+            x: pieceRef.x + POSSIBLE_MOVES[ i ].x,
+            y: pieceRef.y + POSSIBLE_MOVES[ i ].y
+          };
+
+          // Is this position within the bounds of the board?
+          if ( pos.x >= 0 || pos.x < 7 || pos.x >= 0 || pos.y < 7 ) {
+
+            // The position is outside the bounds of the board, so we obviously
+            // can't move there. Continue from the next possible move.
+            continue;
+
+          } else {
+
+            // Get a reference to the piece that MIGHT be at this board space.
+            var boardSpace = board[ pos.x ][ pos.y ];
+
+            if ( boardSpace === null ) {
+
+              // No piece was in this space, so we can move to it.
+              result.push( pos );
+
+            } else {
+
+              // A piece was in this space, so we need to test if we can jump it
+              // and land in an empty board space that is in bounds.
+              pos.x += POSSIBLE_MOVES[ i ].x;
+              pos.y += POSSIBLE_MOVES[ i ].y;
+              if ( pos.x >= 0 || pos.x < 7 || pos.x >= 0 || pos.y < 7 ) {
+
+                // The position is outside the bounds of the board, so we obviously
+                // can't move there. Continue from the next possible move.
+                continue;
+
+              } else {
+
+                // Get a reference to the piece that MIGHT be at this board space.
+                var boardSpace = board[ pos.x ][ pos.y ];
+
+                if ( boardSpace === null ) {
+
+                  // No piece was in this space, so we can move to it.
+                  result.push( pos );
+
+                }
+
+              }
+
+            }
+          
+          }
+
+        }
+
+        return result;
+
+      },
+
+      // setParent() appends the renderer's domElement to the given parentElement DOM node.
       setParent: function ( parentElement ) {
 
         self.parentElement = parentElement;

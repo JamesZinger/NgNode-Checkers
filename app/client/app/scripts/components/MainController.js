@@ -3,7 +3,7 @@
 
 app.controller( 'MainController', function () {
 
-  // Redirect to home
+  // Redirect to the homepage
   window.location.href = window.location.href + 'home';
 
 } );
