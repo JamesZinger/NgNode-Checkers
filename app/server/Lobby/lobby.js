@@ -41,6 +41,9 @@ function request(socket, data)
 	else
 	{
 		var clientContext = Clients[socket.id];
+		if (clientContext.isPlaying)
+			return;
+
 		switch ( data.cmd )
 		{
 			//Create Game
@@ -353,10 +356,9 @@ function setName(clientContext, data)
 
 	if (clientContext.name !== "")
 	{
-		var index = NamedClients.indexOf(clientContext.name);
+		if ('undefined' != typeof NamedClients[clientContext.name])
+			delete NamedClients[clientContext.name];
 
-		if (index != -1)
-			NamedClients.splice(index, 1);
 	}
 	else
 	{
@@ -371,8 +373,8 @@ function setName(clientContext, data)
 		do 
 		{
 			var potentialName = SciNames[Math.floor(Math.random()*SciNames.length)];
-			var testValue = NamedClients.indexOf(potentialName);
-			if (testValue === -1)
+			
+			if ('undefined' == typeof NamedClients[potentialName])
 			{
 				name = potentialName;
 				break;
@@ -389,18 +391,18 @@ function setName(clientContext, data)
 			pushPlayerUpdate(clientContext);
 
 		return{
-			approved: true
+			approved: true,
+			data: name
 		};
 	}
 
 	else
 	{
-		var sampleValue = NamedClients.indexOf(data);
 
-		if (sampleValue !== -1)
+		if ('undefined' != NamedClients[data])
 		{
 			return {
-				approved: false,
+				approved:false,
 				data: "Name is already taken"
 			};
 		}
@@ -414,7 +416,8 @@ function setName(clientContext, data)
 			pushPlayerUpdate(clientContext);
 
 		return {
-			approved: true
+			approved: true,
+			data: data
 		};
 	}
 }

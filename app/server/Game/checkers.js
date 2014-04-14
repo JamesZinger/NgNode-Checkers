@@ -1,57 +1,109 @@
-var Players = [];
-
-var game_id_counter = 1;
-
-function Checkers(client)
+function Checkers(game)
 {
-	this.id = game_id_counter;
-	game_id_counter++;
-
-	this.gameName = name;
-	
-	this.players = [];
-	players.push(client);
+	if ('undefined' == typeof game)
+		return;
 
 	var self = this;
 
-	this.leaveGame = function(client)
-	{
-		if ('undefined' == typeof client)
-			return;
+	this.board = null;
+	this.game = game;
 
-		var index = players.indexOf(client);
-		self.players.splice(index,1);
-		
-		if (players.length === 0)
-			return true;
-		else 
-			return false;
+	this.players = [];
+
+	this.init = function()
+	{
+		for (var i = 0; i < self.game.players.length; i++)
+		{
+			var client = self.game.players[i];
+
+			self.players[client.cl_socket] = new Player(client, i);
+			
+			client.cl_socket.on('game', function(data)
+			{
+				self.request(client.cl_socket, data);
+			});
+		}
 	};
 
-	this.joinGame = function(client)
+	this.request = function(socket, data)
 	{
-		if ('undefined' == typeof client)
-			return;
-
-		if(self.players.length === 1)
+		if ( 'undefined' == typeof socket )
 		{
-			self.players.push(client);
-			return true;
+			return;
 		}
+
+		var res = null;
+		if ( 'undefined' == typeof data || 'undefined' == typeof data.cmd )
+		{
+			res = {
+				approved: false,
+				data: "Error invaild request"
+			};
+		}
+
 		else
 		{
-			return false;
+			switch(data.cmd)
+			{
+			case 'M':
+				res = movePieceRequest(player);
+				break;
+
+			default:
+
+				break;
+			}
 		}
+
+		socket.emit(res);
+	};
+
+	this.movePieceRequest = function(player)
+	{
+
 	};
 }
 
-function Request(socket, data)
+function Piece(teamNumber, tile)
 {
-	//Decode the JSON API
+	if ('undefined' == typeof teamNumber)
+		return;
+
+	var self = this;
+
+	this.x = tile.x;
+	this.y = tile.y;
+	tile.hasPiece = true;
+	this.isKing = false;
+	this.teamNumber = teamNumber;
 }
 
-exports.CreateGame = function(client)
+function Tile(x, y)
 {
-	var game = new Checkers(client);
-	return game;
+	this.x = x;
+	this.y = y;
+	this.hasPiece = false;
+}
+
+function Board()
+{
+	var self = this;
+
+	this.pieces = [];
+
+}
+
+function Player(client, number)
+{
+	if ('undefined' == typeof client || 'undefined' == typeof number)
+		return;
+
+	this.client = client;
+	this.number = number;
+}
+
+exports.CreateGame = function( game )
+{
+	var checkers = new Checkers(game);
+	return checkers;
 };

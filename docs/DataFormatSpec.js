@@ -20,7 +20,7 @@
 // Request Format
 var req = {
 
-  cmd: ‘C’, // Command code -- A letter or short sequence of letters.
+  cmd: 'C', // Command code -- A letter or short sequence of letters.
   data: null, // Any data type.
 
 };
@@ -65,8 +65,8 @@ var gameLobby = {
         ready: true
       } ]
 
-    };
-
+    }]
+};
     // Checkers Game Data
     var checkersGame = {
 
