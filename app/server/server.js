@@ -5,7 +5,7 @@ var	fs  = require('fs');
 var path = require('path');
 
 var lobby = require('./Lobby/lobby.js');
-var game  = require('./Game/checkers.js');
+var game  = require('./Game/game.js');
 
 server.listen( 3000 );
 

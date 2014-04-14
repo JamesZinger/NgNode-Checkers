@@ -14,6 +14,7 @@ function client(socket)
 	this.gameId       = -1;
 	this.isInitalized = false;
 	this.isReady      = false;
+	this.isPlaying    = false;
 
 	client_id_counter++;
 }
