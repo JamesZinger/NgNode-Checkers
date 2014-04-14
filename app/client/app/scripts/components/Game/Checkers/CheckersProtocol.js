@@ -1,8 +1,9 @@
 /* global app:false */
 'use strict';
 
-app.factory( 'CheckersProtocol', [ 'Socket',
-  function () {
+app.factory( 'CheckersProtocol', [ 
+  'Socket',
+  function ( Socket ) {
 
     // init() will be called just prior to returning the lobby protocol object.
     function init() {
@@ -242,7 +243,7 @@ app.factory( 'CheckersProtocol', [ 'Socket',
       },
 
       // requestMovePiece() notifies the server of the player's intent to move a piece on the board.
-      requestMovePiece: function ( player, callback, piece, x, y ) {
+      requestMovePiece: function ( player, piece, x, y, callback ) {
 
         // Build the data packet to send with the request
         var data = {

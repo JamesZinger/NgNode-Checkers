@@ -8,8 +8,8 @@
     <hr />
     <table>
       <tr>
-        <td><p><label for="input-username">Tell us your username:</label><br /><input type="text" id="input-username" ng-model="username" ng-trim="true" value="{{ username }}" ></input></p></td>
-        <td><p><a class="btn btn-success" ng-href="#lobby">Play Now!&nbsp;&nbsp;<span class="glyphicon glyphicon-play"></span></a></p></td>
+        <td><p><label for="input-username">Tell us your name:</label><br /><input type="text" id="input-username" value="{{ player.name }}" ng-model="player.name" ng-trim="true"></input></p></td>
+        <td><p><a class="btn btn-success" ng-click="onEnterLobbyAction( $event )">Play Now!&nbsp;&nbsp;<span class="glyphicon glyphicon-play"></span></a></p></td>
       </tr>
     </table>
   </div>

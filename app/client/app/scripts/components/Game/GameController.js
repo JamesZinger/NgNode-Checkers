@@ -1,7 +1,9 @@
 /* global app:false */
 'use strict';
 
-app.controller( 'PlayController', function ( $rootScope, $scope, $log, $timeout, CheckersModel ) {
+app.controller( 'GameController', [ 
+  '$rootScope', '$scope', '$log', '$timeout', 'CheckersModel'
+  function ( $rootScope, $scope, $log, $timeout, CheckersModel ) {
 
   // Change the nav button to highlight this page in the navbar
   angular.element( '.navbar-nav > li' ).removeClass( 'active' );

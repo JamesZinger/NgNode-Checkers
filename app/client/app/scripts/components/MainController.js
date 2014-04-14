@@ -1,9 +1,11 @@
 /* global app:false */
 'use strict';
 
-app.controller( 'MainController', function () {
+app.controller( 'MainController', [
+    '$location',
+    function ( $location ) {
 
-  // Redirect to home
-  window.location.href = window.location.href + 'home';
+      // Redirect to the homepage
+      $location.path( 'home' );
 
-} );
+    } );

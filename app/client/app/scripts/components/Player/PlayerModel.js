@@ -3,220 +3,224 @@
 
 // THIS MODULE MUST BE INITIALIZED BEFORE IT CAN BE USED!
 
-app.factory( 'PlayerModel', function ( $log ) {
+app.factory( 'PlayerModel', [
+  '$log',
+  function ( $log ) {
 
-  // Create the player model object
-  var self = {
+    // Create the player model object
+    var self = {
 
-    //
-    // Constants
-    //
+      //
+      // Constants
+      //
 
-    LOBBY_STATE_AVAILABLE: 'Available',
-    LOBBY_STATE_PLAYING: 'Playing',
+      LOBBY_STATE_AVAILABLE: 'Available',
+      LOBBY_STATE_PLAYING: 'Playing',
 
-    LOBBY_READINESS_READY: 'Ready',
-    LOBBY_READINESS_WAITING: 'Waiting',
+      LOBBY_READINESS_READY: 'Ready',
+      LOBBY_READINESS_WAITING: 'Waiting',
 
-    LOBBY_INDEX_NO_GAME: -1,
+      LOBBY_INDEX_NO_GAME: -1,
 
-    //
-    // Member Variables
-    //
+      //
+      // Member Variables
+      //
 
-    // The name of the player typed in when they log in on the homepage.
-    name = '',
+      // The name of the player typed in when they log in on the homepage.
+      name = '',
 
-    // The lobby that the player is participating in
-    lobby: null,
+      // The lobby that the player is participating in
+      lobby: null,
 
-    // The state of the player in the lobby (LOBBY_STATE_AVAILABLE or 
-    // LOBBY_STATE_PLAYING).
-    lobbyState = LOBBY_STATE_AVAILABLE,
+      // The state of the player in the lobby (LOBBY_STATE_AVAILABLE or 
+      // LOBBY_STATE_PLAYING).
+      lobbyState = LOBBY_STATE_AVAILABLE,
 
-    // A reference to a game in the lobby that the player currently belongs to
-    gameLobby = null,
+      // A reference to a game in the lobby that the player currently belongs to
+      gameLobby = null,
 
-    // If the player is in a game, the index of this player in the game's player list.
-    // Note: If the player is not in a game, this should be LOBBY_INDEX_NO_GAME.
-    gameLobbyIndex = LOBBY_INDEX_NO_GAME,
+      // If the player is in a game, the index of this player in the game's player list.
+      // Note: If the player is not in a game, this should be LOBBY_INDEX_NO_GAME.
+      gameLobbyIndex = LOBBY_INDEX_NO_GAME,
 
-    // A reference to the game state of the game in progress
-    game = null,
+      // A reference to the game state of the game in progress
+      game = null,
 
-    //
-    // Init
-    //
+      //
+      // Init
+      //
 
-    // init() hooks up the given lobby to this player and requests that the lobby 
-    // assign a random initial name to the player.
-    init: function ( lobby ) {
+      // init() hooks up the given lobby to this player and requests that the lobby 
+      // assign a random initial name to the player.
+      init: function ( lobby ) {
 
-      $log.info( 'PlayerModel.init()' );
+        $log.info( 'PlayerModel.init()' );
 
-      // Store the lobby model reference
-      self.lobby = lobby;
+        // Store the lobby model reference
+        self.lobby = lobby;
 
-      // Request that the lobby model assign a random scientist name to the player
-      self.lobby.requestSetName( self, '' );
+        // Request that the lobby model assign a random scientist name to the player
+        self.lobby.requestSetName( self, '' );
 
-    },
+      },
 
-    //
-    // Requests
-    //
+      //
+      // Requests
+      //
 
-    // requestCreateGame() issues a request to the lobby model to create a
-    // new game in the lobby with this player as the host.
-    requestCreateGame: function () {
+      // requestCreateGame() issues a request to the lobby model to create a
+      // new game in the lobby with this player as the host.
+      requestCreateGame: function () {
 
-      $log.info( 'PlayerModel.requestCreateGame()' );
-      self.lobby.requestCreateGame( self );
+        $log.info( 'PlayerModel.requestCreateGame()' );
+        self.lobby.requestCreateGame( self );
 
-    },
+      },
 
-    // requestJoinGame() issues a request to the lobby model to join the game
-    // hosted by the user whose name matches the given hostName.
-    requestJoinGame: function ( hostName ) {
+      // requestJoinGame() issues a request to the lobby model to join the game
+      // hosted by the user whose name matches the given hostName.
+      requestJoinGame: function ( hostName ) {
 
-      $log.info( 'PlayerModel.requestJoinGame()' );
-      self.lobby.requestJoinGame( self, hostName );
+        $log.info( 'PlayerModel.requestJoinGame()' );
+        self.lobby.requestJoinGame( self, hostName );
 
-    },
+      },
 
-    // requestLeaveGame() issues a request to the lobby model to have this
-    // player leave the game to which he/she currently belongs. If this player
-    // is the host of the game, the game is cancelled.
-    requestLeaveGame: function () {
+      // requestLeaveGame() issues a request to the lobby model to have this
+      // player leave the game to which he/she currently belongs. If this player
+      // is the host of the game, the game is cancelled.
+      requestLeaveGame: function () {
 
-      $log.info( 'PlayerModel.requestLeaveGame()' );
-      self.lobby.requestLeaveGame( self );
+        $log.info( 'PlayerModel.requestLeaveGame()' );
+        self.lobby.requestLeaveGame( self );
 
-    },
+      },
 
-    // requestSetName()  issues a request to the lobby model to change this
-    // player's name to the given newName. If newName is set to '', a random
-    // unique scientist name will be reutrned from the server.
-    requestSetName: function ( newName ) {
+      // requestSetName()  issues a request to the lobby model to change this
+      // player's name to the given newName. If newName is set to '', a random
+      // unique scientist name will be reutrned from the server.
+      requestSetName: function ( newName ) {
 
-      $log.info( 'PlayerModel.requestSetName()' );
-      self.lobby.requestSetName( self, newName );
+        $log.info( 'PlayerModel.requestSetName()' );
+        self.lobby.requestSetName( self, newName );
 
-    },
+      },
 
-    // requestSetReady() issues a request to the lobby model to change this 
-    // player's readiness be set to 'Ready' in the player's current game.
-    requestSetReady: function () {
+      // requestSetReady() issues a request to the lobby model to change this 
+      // player's readiness be set to 'Ready' in the player's current game.
+      requestSetReady: function () {
 
-      $log.info( 'PlayerModel.requestSetReady()' );
-      self.lobby.requestSetReady( self );
+        $log.info( 'PlayerModel.requestSetReady()' );
+        self.lobby.requestSetReady( self );
 
-    },
+      },
 
-    // requestSetWaiting() issues a request to the lobby model to change this 
-    // player's readiness be set to 'Waiting' in the player's current game.
-    requestSetWaiting: function () {
+      // requestSetWaiting() issues a request to the lobby model to change this 
+      // player's readiness be set to 'Waiting' in the player's current game.
+      requestSetWaiting: function () {
 
-      $log.info( 'PlayerModel.requestSetWaiting()' );
-      self.lobby.requestSetWaiting( self );
+        $log.info( 'PlayerModel.requestSetWaiting()' );
+        self.lobby.requestSetWaiting( self );
 
-    },
+      },
 
-    // requestMovePiece() issues a request to the checkers model to move the
-    // given piece to the given (x, y) board space.
-    requestMovePiece: function ( piece, x, y ) {
+      // requestMovePiece() issues a request to the checkers model to move the
+      // given piece to the given (x, y) board space.
+      requestMovePiece: function ( piece, x, y ) {
 
-      $log.info( 'PlayerModel.requestMovePiece()' );
-      self.game.requestMovePiece( self, piece, x, y );
+        $log.info( 'PlayerModel.requestMovePiece()' );
+        self.game.requestMovePiece( self, piece, x, y );
 
-    },
+      },
 
-    //
-    // Request Callbacks
-    //
+      //
+      // Request Callbacks
+      //
 
-    // onCreatedOrJoinedGame() is called in response to the lobby model approving 
-    // the player's request to create a game.
-    onCreatedOrJoinedGame: function ( game ) {
+      // onCreatedOrJoinedGame() is called in response to the lobby model approving 
+      // the player's request to create a game.
+      onCreatedOrJoinedGame: function ( game ) {
 
-      $log.info( 'PlayerModel.onCreatedOrJoinedGame()' );
+        $log.info( 'PlayerModel.onCreatedOrJoinedGame()' );
 
-      // Store the game reference, keep the player's index in the game's player 
-      // list and switch the player's state to LOBBY_STATE_PLAYING.
-      self.gameLobby = game;
-      self.gameLobbyIndex = game.players.length - 1;
-      self.lobbyState = LOBBY_STATE_PLAYING;
+        // Store the game reference, keep the player's index in the game's player 
+        // list and switch the player's state to LOBBY_STATE_PLAYING.
+        self.gameLobby = game;
+        self.gameLobbyIndex = game.players.length - 1;
+        self.lobbyState = LOBBY_STATE_PLAYING;
 
-    },
+      },
 
-    // onLeftGame() is called in response to the lobby model approving the
-    // player's request to leave a game.
-    onLeftGame: function () {
+      // onLeftGame() is called in response to the lobby model approving the
+      // player's request to leave a game.
+      onLeftGame: function () {
 
-      $log.info( 'PlayerModel.onLeftGame()' );
+        $log.info( 'PlayerModel.onLeftGame()' );
 
-      // Clear the game reference, reset the player index to LOBBY_INDEX_NO_GAME
-      // list and switch the player's state to LOBBY_STATE_AVAILABLE.
-      self.gameLobby = null;
-      self.gameLobbyIndex = LOBBY_INDEX_NO_GAME;
-      self.state = LOBBY_STATE_AVAILABLE;
+        // Clear the game reference, reset the player index to LOBBY_INDEX_NO_GAME
+        // list and switch the player's state to LOBBY_STATE_AVAILABLE.
+        self.gameLobby = null;
+        self.gameLobbyIndex = LOBBY_INDEX_NO_GAME;
+        self.state = LOBBY_STATE_AVAILABLE;
 
-    },
+      },
 
-    // onSetName() is called in response to the lobby model approving the
-    // player's request to set his/her name.
-    onSetName: function ( newName ) {
+      // onSetName() is called in response to the lobby model approving the
+      // player's request to set his/her name.
+      onSetName: function ( newName ) {
 
-      $log.info( 'PlayerModel.onSetName()' );
+        $log.info( 'PlayerModel.onSetName()' );
 
-      // Set the player's name
-      self.name = newName;
+        // Set the player's name
+        self.name = newName;
 
-    },
+      },
 
-    // onSetReady() is called in response to the lobby model approving the
-    // player's request to be marked as ready to play in the game to which
-    // the players currently belongs.
-    onSetReady: function () {
+      // onSetReady() is called in response to the lobby model approving the
+      // player's request to be marked as ready to play in the game to which
+      // the players currently belongs.
+      onSetReady: function () {
 
-      $log.info( 'PlayerModel.onSetReady()' );
+        $log.info( 'PlayerModel.onSetReady()' );
 
-      // Set readiness in the game to LOBBY_READINESS_READY
-      self.gameLobby.players[ self.gameLobbyIndex ].ready = LOBBY_READINESS_READY;
+        // Set readiness in the game to LOBBY_READINESS_READY
+        self.gameLobby.players[ self.gameLobbyIndex ].ready = LOBBY_READINESS_READY;
 
-    },
+      },
 
-    // onSetWaiting() is called in response to the lobby model approving the
-    // player's request to be marked as not ready to play in the game to 
-    // which the players currently belongs.
-    onSetWaiting: function () {
+      // onSetWaiting() is called in response to the lobby model approving the
+      // player's request to be marked as not ready to play in the game to 
+      // which the players currently belongs.
+      onSetWaiting: function () {
 
-      $log.info( 'PlayerModel.onSetWaiting()' );
+        $log.info( 'PlayerModel.onSetWaiting()' );
 
-      // Set readiness in the game to LOBBY_READINESS_WAITING
-      self.gameLobby.players[ self.gameLobbyIndex ].ready = LOBBY_READINESS_WAITING;
+        // Set readiness in the game to LOBBY_READINESS_WAITING
+        self.gameLobby.players[ self.gameLobbyIndex ].ready = LOBBY_READINESS_WAITING;
 
-    },
+      },
 
-    //
-    // Utility Functions
-    //
+      //
+      // Utility Functions
+      //
 
-    // getGameHostName() returns the name of the player hosting the game that the
-    // player currently belongs to. If the player is not currently in a game, then
-    // null is returned instead.
-    getGameHostName: function () {
+      // getGameHostName() returns the name of the player hosting the game that the
+      // player currently belongs to. If the player is not currently in a game, then
+      // null is returned instead.
+      getGameHostName: function () {
 
-      var result = null;
-      if ( self.gameLobby === null ) {
-        return result;
+        var result = null;
+        if ( self.gameLobby === null ) {
+          return result;
+        }
+        return self.gameLobby.players[ 0 ].name;
+
       }
-      return self.gameLobby.players[ 0 ].name;
 
     }
 
+    return self;
+
   }
-
-  return self;
-
-} );
+  
+] );

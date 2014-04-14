@@ -20,7 +20,7 @@
 // Request Format
 var req = {
 
-  cmd: 'C', // Command code -- A letter or short sequence of letters.
+  cmd: ‘C’, // Command code -- A letter or short sequence of letters.
   data: null, // Any data type.
 
 };
@@ -48,44 +48,210 @@ var push = {
 // Lobby Game Data
 var gameLobby = {
 
+  initialPlayerName: 'Anon053',
   players: [ { // Array of players belonging to the game. The host is always index 0.
     name: 'Kristina', // Player name (used as a unique identifier).
-    state: 'Available' // In-game or available to join/create games? -- 'Available' or 'Playing'
+    ready: true // Is the player ready to begin playing? -- true or false.
   }, {
     name: 'James',
     ready: false
   } ],
   games: [ {
-    players: [ {
-    name: 'James',
-    ready: false
-	}, {
-    name: 'Kristina',
-    ready: true
-	} ]
+      players: [ {
+        name: 'James',
+        ready: false
+      }, {
+        name: 'Kristina',
+        ready: true
+      } ]
 
-}]};
+    };
 
-// Lobby Player Data
-var playerLobby = {
+    // Checkers Game Data
+    var checkersGame = {
 
-  name: 'James', // Player name (used as a unique identifier).
-  state: 'Available' // In-game or available to join/create games? -- 'Available' or 'Playing'
+      playerColour: 1,
+      turn: 0,
+      board: [
+        [ null, {
+            id: 'R4',
+            x: 1,
+            y: 0,
+            king: false
+          },
+          null, {
+            id: 'R3',
+            x: 3,
+            y: 0,
+            king: false
+          },
+          null, {
+            id: 'R2',
+            x: 5,
+            y: 0,
+            king: false
+          },
+          null, {
+            id: 'R1',
+            x: 7,
+            y: 0,
+            king: false
+          }
+        ],
+        [ {
+            id: 'R8',
+            x: 2,
+            y: 1,
+            king: false
+          },
+          null, {
+            id: 'R7',
+            x: 4,
+            y: 1,
+            king: false
+          },
+          null, {
+            id: 'R6',
+            x: 4,
+            y: 1,
+            king: false
+          },
+          null, {
+            id: 'R5',
+            x: 6,
+            y: 1,
+            king: false
+          },
+          null
+        ],
+        [ null, {
+            id: 'R12',
+            x: 1,
+            y: 2,
+            king: false
+          },
+          null, {
+            id: 'R11',
+            x: 3,
+            y: 2,
+            king: false
+          },
+          null, {
+            id: 'R10',
+            x: 5,
+            y: 2,
+            king: false
+          },
+          null, {
+            id: 'R9',
+            x: 7,
+            y: 2,
+            king: false
+          }
+        ],
+        [ null, null, null, null, null, null, null, null ],
+        [ null, null, null, null, null, null, null, null ],
+        [ {
+            id: 'B9',
+            x: 0,
+            y: 5,
+            king: false
+          },
+          null, {
+            id: 'B10',
+            x: 2,
+            y: 5,
+            king: false
+          },
+          null, {
+            id: 'B11',
+            x: 4,
+            y: 5,
+            king: false
+          },
+          null, {
+            id: 'B12',
+            x: 6,
+            y: 5,
+            king: false
+          },
+          null
+        ],
+        [ null, {
+            id: 'B5',
+            x: 1,
+            y: 6,
+            king: false
+          },
+          null, {
+            id: 'B6',
+            x: 3,
+            y: 6,
+            king: false
+          },
+          null, {
+            id: 'B7',
+            x: 5,
+            y: 6,
+            king: false
+          },
+          null, {
+            id: 'B8',
+            x: 7,
+            y: 6,
+            king: false
+          }
+        ],
+        [ {
+            id: 'B1',
+            x: 0,
+            y: 7,
+            king: false
+          },
+          null, {
+            id: 'B2',
+            x: 2,
+            y: 7,
+            king: false
+          },
+          null, {
+            id: 'B3',
+            x: 4,
+            y: 7,
+            king: false
+          },
+          null, {
+            id: 'B4',
+            x: 6,
+            y: 7,
+            king: false
+          },
+          null
+        ],
+      ]
 
-};
+    };
 
-// Gameplay Move Piece Request Data
-var pieceMoveReqData = {
+    // Lobby Player Data
+    var playerLobby = {
 
-  piece: 'B2', // Text identifier of the piece to act on -- 'B' for black or 'R' for red, then piece # [0, 11].
-  x: 2, // Horizontal board position -- [0, 7].
-  y: 4 // Vertical board position -- [0, 7].
+      name: 'James', // Player name (used as a unique identifier).
+      state: 'Available' // In-game or available to join/create games? -- 'Available' or 'Playing'
 
-};
+    };
 
-// Gameplay Move Piece Response Data
-var pieceMoveResData = {
+    // Gameplay Move Piece Request Data
+    var pieceMoveReqData = {
 
-  endTurn: false // Whether or not the player's turn has ended -- true or false.
+      piece: 'B2', // Text identifier of the piece to act on -- 'B' for black or 'R' for red, then piece # [0, 11].
+      x: 2, // Horizontal board position -- [0, 7].
+      y: 4 // Vertical board position -- [0, 7].
 
-};
+    };
+
+    // Gameplay Move Piece Response Data
+    var pieceMoveResData = {
+
+      endTurn: false // Whether or not the player's turn has ended -- true or false.
+
+    };
