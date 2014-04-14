@@ -20,7 +20,7 @@
 // Request Format
 var req = {
 
-  cmd: ‘C’, // Command code -- A letter or short sequence of letters.
+  cmd: 'C', // Command code -- A letter or short sequence of letters.
   data: null, // Any data type.
 
 };
@@ -48,24 +48,23 @@ var push = {
 // Lobby Game Data
 var gameLobby = {
 
-  initialPlayerName: 'Anon053',
   players: [ { // Array of players belonging to the game. The host is always index 0.
     name: 'Kristina', // Player name (used as a unique identifier).
-    ready: true // Is the player ready to begin playing? -- true or false.
+    state: 'Available' // In-game or available to join/create games? -- 'Available' or 'Playing'
   }, {
     name: 'James',
     ready: false
   } ],
   games: [ {
     players: [ {
-	  name: 'James',
-	  ready: false
+    name: 'James',
+    ready: false
 	}, {
-	  name: 'Kristina',
-	  ready: true
+    name: 'Kristina',
+    ready: true
 	} ]
 
-};
+}]};
 
 // Lobby Player Data
 var playerLobby = {

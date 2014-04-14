@@ -1,25 +1,25 @@
-/* global require:false,
-	exports:false,
-	console:false */
-'use strict';
 // What is Unique about a client
 
 var client_id_counter = 1;
 
-function client()
+function client(socket)
 {
-	var cl_id = -1;
-	var name = "";
-	var cl_socket;
-	var isInGame = false;
+	if ('undefined' == typeof socket)
+		return;
+
+	this.cl_id        = client_id_counter;
+	this.name         = "";
+	this.cl_socket    = socket;
+	this.isInGame     = false;
+	this.gameId       = -1;
+	this.isInitalized = false;
+	this.isReady      = false;
+
+	client_id_counter++;
 }
 
 exports.CreateClient = function(socket)
 {
-	var cl = client();
-	console.log("Client: " + cl);
-	cl.cl_socket = socket;
-	cl.cl_id = client_id_counter;
-	client_id_counter++;
+	var cl = new client(socket);
 	return cl;
 };
