@@ -5,7 +5,7 @@
 
 app.factory( 'PlayerModel', [
   '$log',
-  function ( $log ) {
+  function ( $log ) { 
 
     // Create the player model object
     var self = {
@@ -27,24 +27,24 @@ app.factory( 'PlayerModel', [
       //
 
       // The name of the player typed in when they log in on the homepage.
-      name = '',
+      name: '',
 
       // The lobby that the player is participating in
       lobby: null,
 
       // The state of the player in the lobby (LOBBY_STATE_AVAILABLE or 
       // LOBBY_STATE_PLAYING).
-      lobbyState = LOBBY_STATE_AVAILABLE,
+      lobbyState: 'Available',
 
       // A reference to a game in the lobby that the player currently belongs to
-      gameLobby = null,
+      gameLobby: null,
 
       // If the player is in a game, the index of this player in the game's player list.
       // Note: If the player is not in a game, this should be LOBBY_INDEX_NO_GAME.
-      gameLobbyIndex = LOBBY_INDEX_NO_GAME,
+      gameLobbyIndex: -1,
 
       // A reference to the game state of the game in progress
-      game = null,
+      game: null,
 
       //
       // Init
@@ -147,7 +147,7 @@ app.factory( 'PlayerModel', [
         // list and switch the player's state to LOBBY_STATE_PLAYING.
         self.gameLobby = game;
         self.gameLobbyIndex = game.players.length - 1;
-        self.lobbyState = LOBBY_STATE_PLAYING;
+        self.lobbyState = self.LOBBY_STATE_PLAYING;
 
       },
 
@@ -160,8 +160,8 @@ app.factory( 'PlayerModel', [
         // Clear the game reference, reset the player index to LOBBY_INDEX_NO_GAME
         // list and switch the player's state to LOBBY_STATE_AVAILABLE.
         self.gameLobby = null;
-        self.gameLobbyIndex = LOBBY_INDEX_NO_GAME;
-        self.state = LOBBY_STATE_AVAILABLE;
+        self.gameLobbyIndex = self.LOBBY_INDEX_NO_GAME;
+        self.state = self.LOBBY_STATE_AVAILABLE;
 
       },
 
@@ -184,7 +184,7 @@ app.factory( 'PlayerModel', [
         $log.info( 'PlayerModel.onSetReady()' );
 
         // Set readiness in the game to LOBBY_READINESS_READY
-        self.gameLobby.players[ self.gameLobbyIndex ].ready = LOBBY_READINESS_READY;
+        self.gameLobby.players[ self.gameLobbyIndex ].ready = self.LOBBY_READINESS_READY;
 
       },
 
@@ -196,7 +196,7 @@ app.factory( 'PlayerModel', [
         $log.info( 'PlayerModel.onSetWaiting()' );
 
         // Set readiness in the game to LOBBY_READINESS_WAITING
-        self.gameLobby.players[ self.gameLobbyIndex ].ready = LOBBY_READINESS_WAITING;
+        self.gameLobby.players[ self.gameLobbyIndex ].ready = self.LOBBY_READINESS_WAITING;
 
       },
 
@@ -217,7 +217,7 @@ app.factory( 'PlayerModel', [
 
       }
 
-    }
+    };
 
     return self;
 

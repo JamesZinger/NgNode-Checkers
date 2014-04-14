@@ -10,7 +10,7 @@ app.factory( 'CheckersProtocol', [
 
       // Register the checkers protocol's interpretPushCommand() function as the callback 
       // for all network events of on the 'checkers' channel.
-      Socket.on( 'checkers', lobbyProtocol.interpretPushCommand );
+      Socket.on( 'checkers', checkersProtocol.interpretPushCommand );
 
     }
 
@@ -23,7 +23,7 @@ app.factory( 'CheckersProtocol', [
 
       CHECKERS_REQ_MOVE_PIECE: 'M',
       CHECKERS_PUSH_BEGIN_TURN: 'B',
-      CHECKERS_PUSH_GAME_OVER: 'GO'
+      CHECKERS_PUSH_GAME_OVER: 'GO',
       CHECKERS_PUSH_PIECE_DEAD: 'D',
       CHECKERS_PUSH_PIECE_KINGED: 'K',
       CHECKERS_PUSH_PIECE_POSITIONED: 'P',
@@ -234,7 +234,7 @@ app.factory( 'CheckersProtocol', [
         var request = {
           cmd: cmd,
           data: data,
-          name: pname
+          name: name
         };
 
         // Emit the request on the checkers channel

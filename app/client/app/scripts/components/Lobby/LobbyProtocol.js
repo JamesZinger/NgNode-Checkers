@@ -23,7 +23,7 @@ app.factory( 'LobbyProtocol', [
 
       LOBBY_REQ_INIT: 'I',
       LOBBY_REQ_CREATE_GAME: 'C',
-      LOBBY_REQ_LEAVE_GAME; 'L',
+      LOBBY_REQ_LEAVE_GAME: 'L',
       LOBBY_REQ_JOIN_GAME: 'J',
       LOBBY_REQ_SET_NAME: 'N',
       LOBBY_REQ_SET_READY: 'R',
@@ -302,7 +302,7 @@ app.factory( 'LobbyProtocol', [
         var request = {
           cmd: cmd,
           data: data,
-          name: pname
+          name: name,
         };
 
         // Emit the request on the lobby channel

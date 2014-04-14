@@ -2,8 +2,8 @@
 'use strict';
 
 app.controller( 'HomeController', [
-  '$scope', '$log', '$location', 'PlayerModel', 'LobbyModel',
-  function ( $scope, $log, $location, PlayerModel, LobbyModel ) {
+  '$rootScope', '$scope', '$log', '$location', 'PlayerModel', 'LobbyModel',
+  function ( $rootScope, $scope, $log, $location, PlayerModel, LobbyModel ) {
 
     // Change the nav button to highlight this page in the navbar
     angular.element( '.navbar-nav > li' ).removeClass( 'active' );
@@ -38,7 +38,7 @@ app.controller( 'HomeController', [
     };
 
     // Event listener for lobby init success
-    $scope.onLobbyInitSuccess = function ( data ) {
+    $scope.onLobbyInitSuccess = function () {
 
       $log.info( 'HomeController.onLobbyInitSuccess() >> Lobby initialized successfully!' );
 
