@@ -1,8 +1,9 @@
 /* global app:false */
 'use strict';
 
-app.factory( 'CheckersProtocol', [ 'Socket',
-  function () {
+app.factory( 'CheckersProtocol', [ 
+  'Socket',
+  function ( Socket ) {
 
     // init() will be called just prior to returning the lobby protocol object.
     function init() {

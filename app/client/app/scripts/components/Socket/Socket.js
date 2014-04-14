@@ -1,8 +1,9 @@
 /* global app:false */
 'use strict';
 
-app.factory( 'Socket', [ 'SERVER_ADDRESS',
-  function ( $rootScope ) {
+app.factory( 'Socket', [ 
+  '$rootScope', 'SERVER_ADDRESS',
+  function ( $rootScope, SERVER_ADDRESS ) {
 
     // Connect to the server and create the socket interface object
     var socket = window.io.connect( SERVER_ADDRESS );

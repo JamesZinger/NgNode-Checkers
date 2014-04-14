@@ -1,8 +1,9 @@
 /* global app:false */
 'use strict';
 
-app.factory( 'LobbyModel', [ 'LobbyProtocol', 
-  function ( $log ) {
+app.factory( 'LobbyModel', [
+  '$log', 'LobbyProtocol',
+  function ( $log, LobbyProtocol ) {
 
     // Create the lobby model object
     var self = {
@@ -42,7 +43,7 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
       //
 
       // init() initializes the that of the lobby model so it is ready to use.
-      init: function () {
+      init: function ( player ) {
 
         $log.info( 'LobbyModel.init()' );
 
@@ -54,6 +55,9 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
         LobbyProtocol.registerToPlayerRemove( self.onPushPlayerRemove );
         LobbyProtocol.registerToPlayerUpdate( self.onPushPlayerUpdate );
         LobbyProtocol.registerToStartPlaying( self.onPushStartPlaying );
+
+        // Request to the server to deliver the inital lobby state.
+        self.requestInit( player );
 
       },
 
@@ -69,19 +73,19 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
         switch ( eventType ) {
 
         case self.EVENT_INIT_FAILED:
-          self.registerFromInitFailed( callback );
+          self.registerToInitFailed( callback );
           break;
         case self.EVENT_INIT_SUCCESS:
-          self.registerFromInitSuccess( callback );
+          self.registerToInitSuccess( callback );
           break;
         case self.EVENT_SET_NAME_FAILED:
-          self.registerFromSetNameFailed( callback );
+          self.registerToSetNameFailed( callback );
           break;
         case self.EVENT_SET_NAME_SUCCESS:
-          self.registerFromSetNameSuccess( callback );
+          self.registerToSetNameSuccess( callback );
           break;
         case self.EVENT_START_PLAYING:
-          self.registerFromStartPlaying( callback );
+          self.registerToStartPlaying( callback );
           break;
         default:
           throw 'LobbyModel.addEventListener >> Cannot register to this eventType. Unknown eventType!';
@@ -90,10 +94,10 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
       },
 
-      // registerFromInitFailed() registers the given function callback to be called when a
+      // registerToInitFailed() registers the given function callback to be called when a
       // EVENT_INIT_FAILED event takes place.
       // Note: The callback must be of the form: function ( data ) { ... }
-      registerFromInitFailed: function ( callback ) {
+      registerToInitFailed: function ( callback ) {
 
         var index = self.registryInitFailed.indexOf( callback );
         if ( index < 0 ) {
@@ -102,10 +106,10 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
       },
 
-      // registerFromInitSuccess() registers the given function callback to be called when a
+      // registerToInitSuccess() registers the given function callback to be called when a
       // EVENT_INIT_SUCCESS event takes place.
       // Note: The callback must be of the form: function ( data ) { ... }
-      registerFromInitSuccess: function ( callback ) {
+      registerToInitSuccess: function ( callback ) {
 
         var index = self.registryInitSuccess.indexOf( callback );
         if ( index < 0 ) {
@@ -114,10 +118,10 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
       },
 
-      // registerFromSetNameFailed() registers the given function callback to be called when a
+      // registerToSetNameFailed() registers the given function callback to be called when a
       // EVENT_SET_NAME_FAILED event takes place.
       // Note: The callback must be of the form: function ( data ) { ... }
-      registerFromSetNameFailed: function ( callback ) {
+      registerToSetNameFailed: function ( callback ) {
 
         var index = self.registrySetNameFailed.indexOf( callback );
         if ( index < 0 ) {
@@ -126,10 +130,10 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
       },
 
-      // registerFromSetNameSuccess() registers the given function callback to be called when a
+      // registerToSetNameSuccess() registers the given function callback to be called when a
       // EVENT_SET_NAME_SUCCESS event takes place.
       // Note: The callback must be of the form: function ( data ) { ... }
-      registerFromSetNameSuccess: function ( callback ) {
+      registerToSetNameSuccess: function ( callback ) {
 
         var index = self.registrySetNameSuccess.indexOf( callback );
         if ( index < 0 ) {
@@ -138,10 +142,10 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
 
       },
 
-      // registerFromStartPlaying() registers the given function callback to be called when a
+      // registerToStartPlaying() registers the given function callback to be called when a
       // EVENT_START_PLAYING event takes place.
       // Note: The callback must be of the form: function ( data ) { ... }
-      registerFromStartPlaying: function ( callback ) {
+      registerToStartPlaying: function ( callback ) {
 
         var index = self.registryStartPlaying.indexOf( callback );
         if ( index < 0 ) {
@@ -612,7 +616,7 @@ app.factory( 'LobbyModel', [ 'LobbyProtocol',
             break;
           }
           $log.info( 'LobbyModel.onPushPlayerRemove() >> Removing game...' );
-         self. players.splice( index, 1 );
+          self.players.splice( index, 1 );
         }
 
       },

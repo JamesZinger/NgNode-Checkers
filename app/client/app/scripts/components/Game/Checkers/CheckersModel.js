@@ -2,8 +2,9 @@
 /* global THREE:false */
 'use strict';
 
-app.factory( 'CheckersModel', [ 'CheckersProtocol',
-  function ( $log ) {
+app.factory( 'CheckersModel', [ 
+  '$log', 'CheckersProtocol',
+  function ( $log, CheckersProtocol ) {
 
     // *** Polyfill ***
     // Provides browser support for requestAnimationFrame() since THREE considers
@@ -74,7 +75,7 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
       // Game pieces are attached to cells of a 2D array to indicate their positions,
       // states, and player ownership.
       // Note: Initialized by the game server (onPushStartPlaying).
-      board: null, 
+      board: null,
 
       // This object is used to store a hashmap of pieces to look them up by their IDs.
       // Note: This must be built by the client when the server initialized the board.
@@ -360,56 +361,88 @@ app.factory( 'CheckersModel', [ 'CheckersProtocol',
             y: pieceRef.y + POSSIBLE_MOVES[ i ].y
           };
 
-          // Is this position within the bounds of the board?
-          if ( pos.x >= 0 || pos.x < 7 || pos.x >= 0 || pos.y < 7 ) {
+          if ( self.isValidMove( pieceID, pos.x, pos.y ) ) {
 
-            // The position is outside the bounds of the board, so we obviously
-            // can't move there. Continue from the next possible move.
-            continue;
+            // The move is valid. Push it into the array to be returned.
+            result.push( pos );
 
           } else {
 
-            // Get a reference to the piece that MIGHT be at this board space.
-            var boardSpace = board[ pos.x ][ pos.y ];
+            // Maybe a piece was in this space, so we can check if it is a 
+            // valid move to jump it and land in the space on the opposite side.
+            pos.x += POSSIBLE_MOVES[ i ].x;
+            pos.y += POSSIBLE_MOVES[ i ].y;
 
-            if ( boardSpace === null ) {
+            if ( self.isValidMove( pieceID, pos.x, pos.y ) ) {
 
-              // No piece was in this space, so we can move to it.
+              // The move is valid. Push it into the array to be returned.
               result.push( pos );
 
             } else {
 
-              // A piece was in this space, so we need to test if we can jump it
-              // and land in an empty board space that is in bounds.
-              pos.x += POSSIBLE_MOVES[ i ].x;
-              pos.y += POSSIBLE_MOVES[ i ].y;
-              if ( pos.x >= 0 || pos.x < 7 || pos.x >= 0 || pos.y < 7 ) {
-
-                // The position is outside the bounds of the board, so we obviously
-                // can't move there. Continue from the next possible move.
-                continue;
-
-              } else {
-
-                // Get a reference to the piece that MIGHT be at this board space.
-                var boardSpace = board[ pos.x ][ pos.y ];
-
-                if ( boardSpace === null ) {
-
-                  // No piece was in this space, so we can move to it.
-                  result.push( pos );
-
-                }
-
-              }
+              // The move was invalid. Continue from the next possible move.
+              continue;
 
             }
-          
+
           }
 
         }
 
         return result;
+
+      },
+
+      // isValidMove() checks if the piece with the given piece ID can move into the space
+      // given by the provided (x, y) co-ordinate. Returns true or false.
+      isValidMove: function ( pieceID, x, y ) {
+
+        // Get the piece
+        var pieceRef = pieces[ pieceID ];
+
+        // Throw an exception if no piece exists with the given piece ID
+        if ( pieceRef === null ) {
+          throw 'CheckersModel.isValidMove() >> Cannot check move validity. Invalid piece ID!';
+        }
+
+        // Keep the change in position -- we'll use it soon.
+        var dx = x - pieceRef.x;
+        var dy = y - pieceRef.y;
+
+        // Is this position within the bounds of the board?
+        if ( x >= 0 || x < 7 || y >= 0 || y < 7 ) {
+
+          // The position is outside the bounds of the board.
+          return false;
+
+        } else if ( x % 2 !== y % 2 ) {
+
+          // The piece is being moved to a board space that is out of play (white space).
+          return false;
+
+        } else if ( Math.abs( dx ) > 2 || Math.abs( dx ) > 2 ) {
+
+          // The piece is being moved farther than is possible.
+          return false;
+
+        } else if ( Math.abs( dx ) !== Math.abs( dy ) ) {
+
+          // The piece is not being moved diagonally.
+          return false;
+
+        } else if ( Math.abs( dx ) === 2 && Math.abs( dx ) === 2 && board[ pieceRef.x + dx / 2 ][ pieceRef.y + dy / 2 ] === null ) {
+
+          // The piece is being moved to jump another piece that doesn't exist.
+          return false;
+
+        } else if ( board[ x ][ y ] !== null ) {
+
+          // There is a piece in the target space.
+          return false;
+
+        }
+
+        return true;
 
       },
 
