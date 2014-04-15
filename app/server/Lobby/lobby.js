@@ -230,26 +230,14 @@ function joinGame(clientContext, data, reqId)
 		};
 	}
 
-	var gameId = NamedClients[data].gameId;
+	var gameContext = Games[data];
 
-	if (gameId === -1)
+	if ('undefined' == typeof gameContext)
+	{
 		return{
 			approved: false,
-			data: "Player is not in a game",
-			id: reqId
+			data: "You dun fucked up"
 		};
-
-	var gameContext;
-
-	for (var key in Games)
-	{
-		if (Games.hasOwnProperty(key))
-		{
-			if (Games[key].id === clientContext.gameId)
-			{
-				gameContext = Games[key];
-			}
-		}
 	}
 
 	if (gameContext.joinGame(clientContext) === true)
