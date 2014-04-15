@@ -194,14 +194,14 @@ function leaveGame(clientContext, reqId)
 	var isGameDeleted = gameContext.leaveGame(clientContext);
 	if (isGameDeleted === true)
 	{
-		pushGameClosed(game);
-		delete Games[game.gameName];
+		pushGameClosed(gameContext);
+		delete Games[gameContext.gameName];
 	}
 	else
 	{
-		pushGameUpdated(game);
+		pushGameUpdated(gameContext);
 	}
-	
+
 
 	pushPlayerUpdate(clientContext);
 	return{
