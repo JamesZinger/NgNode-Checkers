@@ -243,7 +243,7 @@ function joinGame(clientContext, data, reqId)
 	if (gameContext.joinGame(clientContext) === true)
 	{
 		clientContext.isInGame = true;
-		clientContext.gameId = gameId;
+		clientContext.gameId = gameContext.gameId;
 
 		pushGameUpdated(gameContext);
 
@@ -525,20 +525,22 @@ function onDisconnect(socket)
 			{
 				if (Games[key].id === client.gameId)
 				{
-					gameContext = Games[key];
+					gameContext0 = Games[key];
 				}
 			}
 		}
-
-		var isGameDeleted = gameContext.leaveGame(client);
-		if (isGameDeleted === true)
+		if('undefined' != typeof gameContext)
 		{
-			pushGameClosed(game);
-			delete Games[game.gameName];
-		}
-		else
-		{
-			pushGameUpdated(game);
+			var isGameDeleted = gameContext.leaveGame(client);
+			if (isGameDeleted === true)
+			{
+				pushGameClosed(game);
+				delete Games[game.gameName];
+			}
+			else
+			{
+				pushGameUpdated(game);
+			}
 		}
 	
 	}
