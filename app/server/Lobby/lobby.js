@@ -190,7 +190,7 @@ function leaveGame(clientContext, reqId)
 	}
 
 	var isGameDeleted = gameContext.leaveGame(clientContext);
-	if (isGameDeleted)
+	if (isGameDeleted === true)
 	{
 		pushGameClosed(game);
 		delete Games[game.gameName];
@@ -632,11 +632,13 @@ function pushGameUpdated(gameContext)
 
 function sendPushRequestToAllBut(req, clientContext)
 {
-	for (var i = 0; i < NamedClients.length; i++)
+	for (var key in NamedClients)
 	{
-		if (NamedClients[i] == clientContext)
-			continue;
-
-		NamedClients[i].cl_socket.emit('lobby', req);
+		if (NamedClients.hasOwnProperty(key))
+		{
+			if (NamedClients[key] == clientContext)
+				continue;
+			NamedClients[key].cl_socket.emit('lobby', req);
+		}
 	}
 }
