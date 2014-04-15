@@ -21,13 +21,13 @@ function Game(client)
 		if ('undefined' == typeof client)
 			return;
 
-		var index = players.indexOf(client);
+		var index = self.players.indexOf(client);
 		self.players.splice(index,1);
 		
 		client.isInGame = false;
 		client.gameId = -1;
 
-		if (players.length === 0)
+		if (self.players.length === 0)
 			return true;
 		else 
 			return false;

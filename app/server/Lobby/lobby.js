@@ -523,7 +523,7 @@ function onDisconnect(socket)
 		{
 			if (Games.hasOwnProperty(key))
 			{
-				if (Games[key].id === clientContext.gameId)
+				if (Games[key].id === client.gameId)
 				{
 					gameContext = Games[key];
 				}
