@@ -201,7 +201,7 @@ function leaveGame(clientContext, reqId)
 	{
 		pushGameUpdated(gameContext);
 	}
-
+	
 
 	pushPlayerUpdate(clientContext);
 	return{
@@ -525,24 +525,35 @@ function onDisconnect(socket)
 			{
 				if (Games[key].id === client.gameId)
 				{
-					gameContext = Games[key];
+					gameContext0 = Games[key];
 				}
 			}
 		}
+<<<<<<< HEAD
+
+		var isGameDeleted = gameContext.leaveGame(client);
+		if (isGameDeleted === true)
+		{
+			pushGameClosed(gameContext);
+			delete Games[gameContext.gameName];
+		}
+		else
+		{
+			pushGameUpdated(gameContext);
+=======
 		if('undefined' != typeof gameContext)
 		{
 			var isGameDeleted = gameContext.leaveGame(client);
 			if (isGameDeleted === true)
 			{
-				pushGameClosed(gameContext);
-				delete Games[gameContext.gameName];
+				pushGameClosed(game);
+				delete Games[game.gameName];
 			}
 			else
 			{
-				pushGameUpdated(gameContext);
+				pushGameUpdated(game);
 			}
-			pushGameClosed(gameContext);
-			delete Games[gameContext.gameName];
+>>>>>>> cb59cb1ce084a599a9548d493c3ccbdab8e32709
 		}
 	
 	}
@@ -630,7 +641,7 @@ function pushGameUpdated(gameContext)
 	{
 		var player = {
 			name: gameContext.players[i].name,
-			ready: gameContext.players[i].isReady
+			ready: gameContext.isReady
 		};
 		game.players.push(player);
 	}
@@ -639,8 +650,6 @@ function pushGameUpdated(gameContext)
 		cmd: 'GU',
 		data: game
 	};
-
-	sendPushRequestToAllBut(req, gameContext.players[0]);
 }
 
 function sendPushRequestToAllBut(req, clientContext)

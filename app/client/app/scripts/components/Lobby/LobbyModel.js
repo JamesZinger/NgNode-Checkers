@@ -533,7 +533,11 @@ app.factory( 'LobbyModel', [
         var index = self.indexOfGameByHostPlayerName( updatedGame.players[ 0 ].name );
 
         // Update the game's members using the data package.
-        self.games[ index ].players = updatedGame.players;
+        //self.games[ index ].players = updatedGame.players;
+        for ( var i = 0; i < self.games.length; i++ ) {
+          self.games[ index ].players[ i ].name = updatedGame.players[ i ].name;
+          self.games[ index ].players[ i ].ready = updatedGame.players[ i ].ready;
+        }
 
       },
 
@@ -577,7 +581,7 @@ app.factory( 'LobbyModel', [
           if ( index === -1 ) {
             break;
           }
-          $log.info( 'LobbyModel.onPushPlayerRemove() >> Removing game...' );
+          $log.info( 'LobbyModel.onPushPlayerRemove() >> Removing player...' );
           self.players.splice( index, 1 );
         }
 
@@ -624,6 +628,10 @@ app.factory( 'LobbyModel', [
       // Note: Returns -1 if the given name didn't match any game's host player.
       indexOfGameByHostPlayerName: function ( name ) {
 
+        if ( self.games === null ) {
+          return -1;
+        }
+
         // Perform a linear search for the game with the host player to match the data package
         var len = self.games.length;
         for ( var i = 0; i < len; i++ ) {
@@ -639,6 +647,10 @@ app.factory( 'LobbyModel', [
       // through the lobby player list for the player by name.
       // Note: Returns -1 if the given name didn't match any player.
       indexOfPlayerByName: function ( name ) {
+
+        if ( self.players === null ) {
+          return -1;
+        }
 
         // Perform a linear search for the game with the host player to match the data package
         var len = self.players.length;
