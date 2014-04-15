@@ -9,7 +9,7 @@ fs.readFile(__dirname + '/piece-locations.json','utf8', function(err, data)
 		console.Error("Cannot load JSON file for piece locations");
 		return;
 	}
-	pieceMap = JSON.parse(data);
+	PIECE_MAP = JSON.parse(data);
 });
 
 function Checkers(game)
@@ -27,7 +27,7 @@ function Checkers(game)
 	this.init = function()
 	{
 		var gameState = {};
-		gameState.turn = currentTurn;
+		gameState.turn = this.currentTurn;
 
 		var board = new Array(8);
 
@@ -591,14 +591,14 @@ function Tile(x, y)
 	this.pieceTeam	= -1;
 	this.isMoveable	= false;
 
-	tile.movePieceOff = function()
+	this.movePieceOff = function()
 	{
 		self.hasPiece	= false;
 		self.pieceId	= -1;
 		self.pieceTeam	= -1;
 	};
 
-	tile.movePieceOn = function(piece)
+	this.movePieceOn = function(piece)
 	{
 		if (self.isMoveable === false)
 			return false;
@@ -626,7 +626,7 @@ function Board()
 		{
 			isColEven = (j % 2 === 0);
 
-			this.tiles[i][j] = new this.tile(i,j);
+			this.tiles[i][j] = new Tile(i,j);
 
 			var xor = (isRowEven ^ isColEven) === 1;
 			if (xor)
@@ -641,10 +641,10 @@ function Board()
 	{
 		this.pieces[i] = new Array(12);
 
-		for (var k = 0; k < pieces[k].length; k++)
+		for (var k = 0; k < this.pieces[i].length; k++)
 		{
 			var loc = PIECE_MAP[i][k];
-			this.ieces[i][k] = new Piece(i,tiles[loc.x][loc.y], k);
+			this.pieces[i][k] = new Piece(i, this.tiles[loc.x][loc.y], k);
 		}
 	}
 }

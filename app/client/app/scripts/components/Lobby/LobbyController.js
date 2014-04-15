@@ -5,21 +5,28 @@ app.controller( 'LobbyController', [
   '$rootScope', '$scope', '$log', '$location',
   function ( $rootScope, $scope, $log, $location ) {
 
-    // Redirect to the home page if not initialized yet
-    if ( !$rootScope.initialized ) {
-      $location.path( 'home' );
+    function start() {
+
+      // Redirect to the home page if not initialized yet
+      if ( !$rootScope.initialized ) {
+        $location.path( 'home' );
+      }
+
+      // Change the nav button to highlight this page in the navbar
+      angular.element( '.navbar-nav > li' ).removeClass( 'active' );
+      angular.element( '#nav-lobby' ).addClass( 'active' );
+
+      // Set the ngView class for this page
+      $scope.pageClass = 'view-lobby';
+
+      // Register callbacks for events on the lobby model
+      $rootScope.player.lobby.addEventListener( $rootScope.player.lobby.EVENT_START_PLAYING, $scope.onStartPlaying );
+      
+      // Scope variables for filtering lists of players and games by the name of a player
+      $scope.filterPlayersName = '';
+      $scope.filterGamesName = '';
+
     }
-
-    // Change the nav button to highlight this page in the navbar
-    angular.element( '.navbar-nav > li' ).removeClass( 'active' );
-    angular.element( '#nav-lobby' ).addClass( 'active' );
-
-    // Set the ngView class for this page
-    $scope.pageClass = 'view-lobby';
-
-    // Scope variables for filtering lists of players and games by the name of a player
-    $scope.filterPlayersName = '';
-    $scope.filterGamesName = '';
 
     // Event listener for the Cancel Game UI action
     $scope.onCancelGameAction = function () {
@@ -74,6 +81,19 @@ app.controller( 'LobbyController', [
       $rootScope.player.requestSetWaiting();
 
     };
+
+    // Event listener for the Start Playing network event
+    $scope.onStartPlaying = function ( data ) {
+
+      $log.info( 'LobbyController.onStartPlaying()' );
+      var gameState = data.data;
+      $rootScope.gameState = gameState;
+      $location.path( 'game' );
+
+    };
+
+    // Start up the controller
+    start();
 
   }
   

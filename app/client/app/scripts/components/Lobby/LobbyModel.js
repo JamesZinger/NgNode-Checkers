@@ -616,15 +616,10 @@ app.factory( 'LobbyModel', [
 
       // onPushStartPlaying() is called when a push notification is received from the server
       // that a the game the player belongs to has begun.
-      onPushStartPlaying: function () {
+      onPushStartPlaying: function ( data ) {
 
         $log.info( 'LobbyModel.onPushStartPlaying()' );
-
-        // Call each of the functions registered as listeners for this event
-        var len = self.registryStartPlaying.length;
-        for ( var i = 0; i < len; i++ ) {
-          self.registryStartPlaying[ i ]();
-        }
+        self.notifyListeners( self.registryStartPlaying, data );
 
       },
 

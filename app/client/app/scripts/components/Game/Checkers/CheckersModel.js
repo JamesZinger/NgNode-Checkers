@@ -67,6 +67,8 @@ app.factory( 'CheckersModel', [
         y: -1
       } ],
 
+      
+
       //
       // Member Variables
       //
@@ -123,6 +125,10 @@ app.factory( 'CheckersModel', [
 
       cube: null,
 
+      meshBoard: null,
+      meshBlackPice: null,
+      meshPieceRed: null,
+
       //
       // Init
       //
@@ -163,18 +169,84 @@ app.factory( 'CheckersModel', [
 
         // Configure the scene
         self.scene = new THREE.Scene();
+
         self.camera = new THREE.PerspectiveCamera( 75, height / width, 0.1, 1000 );
+        self.camera.position.set( 0, 2.5, 1.25 );
+        self.camera.lookAt( new THREE.Vector3( 0, -1, 0 ) );
+
         self.renderer = new THREE.WebGLRenderer();
         self.renderer.setSize( height, width );
+        self.renderer.setClearColorHex( 0xefefef, 1 );
 
-        // Add a cube to the scene so we have something to look at
-        var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-        var material = new THREE.MeshBasicMaterial( {
-          color: 0x00ff00
-        } );
-        self.cube = new THREE.Mesh( geometry, material );
-        self.scene.add( self.cube );
-        self.camera.position.z = 5;
+        // Add a light to the scene
+        self.pointLight = new THREE.PointLight( 0xffffff, 3, 50 );
+        self.pointLight.position.set( 0, 5, 0 );
+        self.scene.add( self.pointLight );
+
+        var ambientLight = new THREE.AmbientLight( 0x111111 );
+        self.scene.add( ambientLight );
+
+        // Load our checkers board model
+        var boardLoader = new THREE.JSONLoader();
+        boardLoader.load( '../../../../assets3D/checkers-board/checkers-board.js',
+          function ( geometry, materials ) {
+
+            var material = new THREE.MeshFaceMaterial( materials );
+            self.meshBoard = new THREE.Mesh( geometry, material );
+            self.meshBoard.scale.set( 1, 1, 1 );
+            self.scene.add( self.meshBoard );
+
+          } );
+
+        // Load our black checkers piece model
+        var blackPieceLoader = new THREE.JSONLoader();
+        blackPieceLoader.load( '../../../../assets3D/checkers-piece/checkers-piece-black.js',
+          function ( geometry, materials ) {
+
+            var material = new THREE.MeshFaceMaterial( materials );
+
+            for ( var i = 0; i < 12; i++ ) {
+
+              var pieceRef = self.pieces[ 'B' + i ];
+              pieceRef.mesh = new THREE.Mesh( geometry, material );
+              pieceRef.mesh.scale.set( 1, 1, 1 );
+              pieceRef.mesh.position = self.getBoardPos( pieceRef.x, pieceRef.y );
+              self.scene.add( pieceRef.mesh );
+
+              self.killPiece( 'B1' );
+              self.killPiece( 'B3' );
+              self.killPiece( 'B5' );
+              self.killPiece( 'B7' );
+              self.killPiece( 'B9' );
+
+            }
+
+          } );
+
+        // Load our red checkers piece model
+        var redPieceLoader = new THREE.JSONLoader();
+        redPieceLoader.load( '../../../../assets3D/checkers-piece/checkers-piece-red.js',
+          function ( geometry, materials ) {
+
+            var material = new THREE.MeshFaceMaterial( materials );
+
+            for ( var i = 0; i < 12; i++ ) {
+
+              var pieceRef = self.pieces[ 'R' + i ];
+              pieceRef.mesh = new THREE.Mesh( geometry, material );
+              pieceRef.mesh.scale.set( 1, 1, 1 );
+              pieceRef.mesh.position = self.getBoardPos( pieceRef.x, pieceRef.y );
+              self.scene.add( pieceRef.mesh );
+
+              self.killPiece( 'R1' );
+              self.killPiece( 'R3' );
+              self.killPiece( 'R5' );
+              self.killPiece( 'R7' );
+              self.killPiece( 'R9' );
+
+            }
+
+          } );
 
       },
 
@@ -188,9 +260,8 @@ app.factory( 'CheckersModel', [
 
         $log.info( 'CheckersModel.destroy()' );
 
-        // Set all variables to null
-        self.scene.remove( self.cube );
-        self.cube = null;
+        // Clear all THREE references
+        
 
         self.scene = null;
         self.camera = null;
@@ -218,8 +289,7 @@ app.factory( 'CheckersModel', [
       // changes on a per-frame basis.
       update: function () {
 
-        self.cube.rotation.x += 0.1;
-        self.cube.rotation.y += 0.1;
+        
 
       },
 
@@ -455,6 +525,31 @@ app.factory( 'CheckersModel', [
 
         self.parentElement = parentElement;
         self.parentElement.append( self.renderer.domElement );
+
+      },
+
+      // getBoardPosFromIndex() returns the actual board position in THREE space, given a board index.
+      getBoardPos: function ( x, z ) {
+
+        return new THREE.Vector3( 0.390 * x - 1.37, 0.05, 0.394 * z - 1.37 );
+
+      },
+
+      // killPiece() moves a piece from the board to one of the dead pieces sets on the side of the board.
+      killPiece: function ( pieceID ) {
+
+        var pieceRef = self.pieces[ pieceID ];
+        if ( pieceRef.id.substring( 0, 1 ) === 'B' ) {
+
+          self.board[ pieceRef.x ][ pieceRef.y ] = null;
+          self.deadPieces[ self.PLAYER_COLOUR_BLACK ].push( pieceRef );
+
+        } else {
+
+          self.board[ pieceRef.x ][ pieceRef.y ] = null;
+          self.deadPieces[ self.PLAYER_COLOUR_RED ].push( pieceRef );
+
+        }
 
       }
 
