@@ -23,7 +23,7 @@ function Game(client)
 		self.players.splice(index,1);
 		
 		client.isInGame = false;
-		cliient.gameId = -1;
+		client.gameId = -1;
 
 		if (players.length === 0)
 			return true;
