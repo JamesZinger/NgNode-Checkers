@@ -82,6 +82,19 @@ app.controller( 'HomeController', [
       // Mark the app as initialized
       $rootScope.initialized = true;
 
+
+      // Hacky fix to get initial lobby player reference into the player model
+      var len = LobbyModel.players.length;
+      for ( var index = 0; index < len; index++ ) {
+        if ( PlayerModel.name === LobbyModel.players[ index ].name ) {
+          break;
+        }
+      }
+      if ( index < len ) {
+        PlayerModel.playerLobby = LobbyModel.players[ index ];
+      }
+
+
       // Move to the lobby view
       $location.path( 'lobby' );
 

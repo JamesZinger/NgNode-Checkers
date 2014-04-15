@@ -1,7 +1,7 @@
 /* global app:false */
 'use strict';
 
-app.factory( 'LobbyProtocol', [ 
+app.factory( 'LobbyProtocol', [
   '$log', 'Socket',
   function ( $log, Socket ) {
 
@@ -142,7 +142,7 @@ app.factory( 'LobbyProtocol', [
           break;
 
         case self.LOBBY_PUSH_GAME_CREATE:
-          self.registerListener( self.registryResGameCreate, callback );
+          self.registerListener( self.registryPushGameCreate, callback );
           break;
 
         case self.LOBBY_PUSH_GAME_REMOVE:
@@ -374,26 +374,26 @@ app.factory( 'LobbyProtocol', [
       // they are related to, so that they can be dealt with appropriately.
       onResponse: function ( res ) {
 
-      // Look up the stored request matching the response's id
-      var associatedRequest = self.sentRequests[ res.id ];
-      
-      // If no request matched the response, throw an exception.
-      if ( 'undefined' == typeof( associatedRequest ) ) {
-        $log.error( 'CheckersProtocol.onResponse() >> Cannot match response to any request by ID!' );
-      }
+        // Look up the stored request matching the response's id
+        var associatedRequest = self.sentRequests[ res.id ];
 
-      // Attach the request to the response
-      res.request = associatedRequest;
+        // If no request matched the response, throw an exception.
+        if ( 'undefined' == typeof ( associatedRequest ) ) {
+          $log.error( 'CheckersProtocol.onResponse() >> Cannot match response to any request by ID!' );
+        }
 
-      // Remove the request from the stored requests since it's no longer needed
-      delete self.sentRequests[ res.id ];
+        // Attach the request to the response
+        res.request = associatedRequest;
 
-      // If a request matched interpret the request's command but pass the response's data
-      switch ( associatedRequest.cmd ) {
+        // Remove the request from the stored requests since it's no longer needed
+        delete self.sentRequests[ res.id ];
+
+        // If a request matched interpret the request's command but pass the response's data
+        switch ( associatedRequest.cmd ) {
 
         case self.LOBBY_REQ_INIT:
-        self.notifyListeners( self.registryResInit, res );
-        break;
+          self.notifyListeners( self.registryResInit, res );
+          break;
 
         case self.LOBBY_REQ_CREATE_GAME:
           self.notifyListeners( self.registryResGameCreate, res );
@@ -422,9 +422,9 @@ app.factory( 'LobbyProtocol', [
         default:
           $log.error( 'CheckersProtocol.onResponse() >> Request command unknown! OMFG IS THIS EVEN POSSIBLE?!' );
 
-      }
+        }
 
-    },
+      }
 
     };
 

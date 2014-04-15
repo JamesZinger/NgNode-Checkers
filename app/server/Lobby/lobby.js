@@ -541,6 +541,8 @@ function onDisconnect(socket)
 			{
 				pushGameUpdated(game);
 			}
+			pushGameClosed(gameContext);
+			delete Games[gameContext.gameName];
 		}
 	
 	}
