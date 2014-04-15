@@ -315,6 +315,8 @@ function setReady(clientContext, reqId)
 
 	pushGameUpdated(gameContext, clientContext);
 
+
+
 	return {
 		approved: true,
 		id: reqId
@@ -367,6 +369,8 @@ function setWait(clientContext, reqId)
 	}
 
 	pushGameUpdated(gameContext, clientContext);
+
+	setTimeout(gameContext.update, 500);
 
 	return {
 		approved: true,

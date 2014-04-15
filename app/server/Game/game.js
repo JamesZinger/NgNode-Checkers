@@ -51,6 +51,20 @@ function Game(client)
 		}
 	};
 
+	this.update = function()
+	{
+		var ready = true;
+		for (var i = 0; i < self.players.length; i++)
+		{
+			ready = (self.players[i].isReady && ready);
+		}
+
+		if(ready === true)
+		{
+			self.onGameStart();
+		}
+	};
+
 	this.onGameStart = function ()
 	{
 		self.gameRef = checkers_template.CreateGame(self);
