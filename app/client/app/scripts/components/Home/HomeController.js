@@ -5,27 +5,64 @@ app.controller( 'HomeController', [
   '$rootScope', '$scope', '$log', '$location', 'PlayerModel', 'LobbyModel',
   function ( $rootScope, $scope, $log, $location, PlayerModel, LobbyModel ) {
 
-    // Change the nav button to highlight this page in the navbar
-    angular.element( '.navbar-nav > li' ).removeClass( 'active' );
-    angular.element( '#nav-home' ).addClass( 'active' );
+    function start() {
 
-    // Set the ngView class for this page
-    $scope.pageClass = 'view-home';
+      // Change the nav button to highlight this page in the navbar
+      angular.element( '.navbar-nav > li' ).removeClass( 'active' );
+      angular.element( '#nav-home' ).addClass( 'active' );
 
-    // Create the player model and call to the server to initialize it by giving 
-    // the player a unique scientist name.
-    $rootScope.player = PlayerModel;
-    $rootScope.player.init( LobbyModel );
+      // Set the ngView class for this page
+      $scope.pageClass = 'view-home';
+
+      // Set the requested name using the player's name
+      $scope.requestedName = PlayerModel.name;
+
+      // Only run the first time the app launches
+      if ( !$rootScope.initialized ) {
+
+        // Register callbacks for events on the lobby model
+        LobbyModel.addEventListener( LobbyModel.EVENT_INIT_FAILED, $scope.onLobbyInitFailed );
+        LobbyModel.addEventListener( LobbyModel.EVENT_INIT_SUCCESS, $scope.onLobbyInitSuccess );
+        LobbyModel.addEventListener( LobbyModel.EVENT_SET_NAME_FAILED, $scope.onPlayerSetNameFailed );
+        LobbyModel.addEventListener( LobbyModel.EVENT_SET_NAME_SUCCESS, $scope.onPlayerSetNameSuccess );
+
+        // Init the lobby to hook up listeners for netowrk events and set the player.
+        LobbyModel.init( PlayerModel );
+
+        // Attach the player model to the root scope and initialize it
+        $rootScope.player = PlayerModel;
+        PlayerModel.init( LobbyModel );
+
+      }
+
+    }
 
     // Event listener for the Enter Lobby UI action
     $scope.onEnterLobbyAction = function () {
 
       // Start some kind of loading view?
-      $log.info( 'HomeController.onEnterLobbyAction() >> Requesting lobby init...' );
+      // TODO
 
-      // Init the lobby (when this is complete it will trigger either 
-      // onLobbyInitFailed() or onLobbyInitSuccess() below)
-      $rootScope.player.lobby.init( $rootScope.player );
+      if ( !$rootScope.initialized ) {
+
+        $log.info( 'HomeController.onEnterLobbyAction() >> Requesting lobby init...' );
+
+        // Get the initial lobby state from the server (when this is complete 
+        // it will trigger either onLobbyInitFailed() or onLobbyInitSuccess() below)
+        // *** NOTE *** This MUST be done after the player init!
+        LobbyModel.requestInit();
+
+      } else if ( PlayerModel.name !== $scope.requestedName ) {
+
+        // Request the adjusted name
+        PlayerModel.requestSetName( $scope.requestedName );
+
+      } else {
+
+        // Move to the lobby view
+        $location.path( 'lobby' );
+
+      }
 
     };
 
@@ -42,6 +79,9 @@ app.controller( 'HomeController', [
 
       $log.info( 'HomeController.onLobbyInitSuccess() >> Lobby initialized successfully!' );
 
+      // Mark the app as initialized
+      $rootScope.initialized = true;
+
       // Move to the lobby view
       $location.path( 'lobby' );
 
@@ -55,10 +95,25 @@ app.controller( 'HomeController', [
 
     };
 
-    // Register callbacks for events on the lobby model
-    LobbyModel.addEventListener( LobbyModel.EVENT_INIT_FAILED, $scope.onLobbyInitFailed );
-    LobbyModel.addEventListener( LobbyModel.EVENT_INIT_SUCCESS, $scope.onLobbyInitSuccess );
-    LobbyModel.addEventListener( LobbyModel.EVENT_SET_NAME_FAILED, $scope.onPlayerSetNameFailed );
+    // Event listener for player set name success
+    $scope.onPlayerSetNameSuccess = function () {
+
+      // Display some kind of error
+      $log.info( 'HomeController.onPlayerSetNameSuccess() >> Set player name successfully!' );
+
+      // Set the requested name field to the player's new name value
+      $scope.requestedName = PlayerModel.name;
+
+      // Move to the lobby view if the lobby is already initialized
+      if ( $rootScope.initialized ) {
+        $location.path( 'lobby' );
+      }
+
+    };
+
+    // Start up the controller
+    start();
+
   }
 
 ] );

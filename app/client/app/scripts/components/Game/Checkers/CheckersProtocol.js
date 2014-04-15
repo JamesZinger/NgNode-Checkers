@@ -221,23 +221,23 @@ app.factory( 'CheckersProtocol', [
         switch ( data.cmd ) {
 
         case self.CHECKERS_PUSH_BEGIN_TURN:
-          self.notifyListeners( self.registryPushBeginTurn, data.data );
+          self.notifyListeners( self.registryPushBeginTurn, data );
           break;
 
         case self.CHECKERS_PUSH_GAME_OVER:
-          self.notifyListeners( self.registryPushGameOver, data.data );
+          self.notifyListeners( self.registryPushGameOver, data );
           break;
 
         case self.CHECKERS_PUSH_PIECE_DEAD:
-          self.notifyListeners( self.registryPushPieceDead, data.data );
+          self.notifyListeners( self.registryPushPieceDead, data );
           break;
 
         case self.CHECKERS_PUSH_PIECE_KINGED:
-          self.notifyListeners( self.registryPushPieceKinged, data.data );
+          self.notifyListeners( self.registryPushPieceKinged, data );
           break;
 
         case self.CHECKERS_PUSH_PIECE_POSITIONED:
-          self.notifyListeners( self.registryPushPiecePositioned, data.data );
+          self.notifyListeners( self.registryPushPiecePositioned, data );
           break;
 
         default:
@@ -272,7 +272,7 @@ app.factory( 'CheckersProtocol', [
         switch ( associatedRequest.cmd ) {
 
           case self.CHECKERS_REQ_MOVE_PIECE:
-            self.notifyListeners( self.registryResMovePiece, res.data );
+            self.notifyListeners( self.registryResMovePiece, res );
             break;
 
           default:

@@ -90,7 +90,7 @@ function request(socket, data)
 				break;
 		}
 	}
-	socket.emit(res);
+	socket.emit( 'lobby', res );
 }
 
 // Helper for adding clients to the lobby.
@@ -421,7 +421,7 @@ function setName(clientContext, data, reqId)
 	else
 	{
 
-		if ('undefined' != NamedClients[data])
+		if ('undefined' != typeof NamedClients[data])
 		{
 			return {
 				approved:false,
@@ -466,35 +466,43 @@ function lobbyInit(clientContext, reqId)
 		};
 	}
 	var ret = {};
-	ret.players = [];
+	ret.approved = true;
+	ret.data = {};
+	ret.data.players = [];
 
-	for (var i = 0; i < NamedClients.length; i++)
+	for (var key in NamedClients)
 	{
-		var player = {};
-		player.name = NamedClients[i].name;
-		player.state = (NamedClients[i].isInGame ? 'Playing' : 'Available');
-		ret.players.push(player);
-	}
-
-	ret.games = [];
-
-	for (i = 0; i < Games.length; i++)
-	{
-		var game = {};
-		game.players = [];
-		for (var j = 0; j < Games[i].players.length; j++) 
+		if(NamedClients.hasOwnProperty(key))
 		{
-			var gamePlayer = {};
-			gamePlayer.name = Games[i].players[j].name;
-			gamePlayer.ready = Games[i].players[j].isReady;
-			game.players.push(gamePlayer);
+			var player = {};
+			player.name = NamedClients[key].name;
+			player.state = (NamedClients[key].isInGame ? 'Playing' : 'Available');
+			ret.data.players.push(player);
 		}
-		ret.Games.push(game);
 	}
 
+	ret.data.games = [];
 
+	for (key in Games)
+	{
+		if(Games.hasOwnProperty(key))
+		{
+			var game = {};
+			game.players = [];
+			for (var j = 0; j < Games[key].players.length; j++) 
+			{
+				var gamePlayer = {};
+				gamePlayer.name = Games[key].players[j].name;
+				gamePlayer.ready = Games[key].players[j].isReady;
+				game.players.push(gamePlayer);
+			}
+			ret.data.Games.push(game);
+		}
+	}
+	
 	ret.id = reqId;
 	clientContext.isInitalized = true;
+	pushPlayerCreated(clientContext);
 	return ret;
 }
 

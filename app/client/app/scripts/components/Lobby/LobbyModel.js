@@ -43,6 +43,9 @@ app.factory( 'LobbyModel', [
       // The lobby game list
       games: null,
 
+      // Counter to keep track of the number of initializion attempts made so far
+      initAttempts: 0,
+
       // Callback registries for important events
       registryInitFailed: [],
       registryInitSuccess: [],
@@ -62,6 +65,9 @@ app.factory( 'LobbyModel', [
         // Store the player
         self.player = player;
 
+        // Set initAttempts to 0
+        self.initAttempts = 0;
+
         // Register event listeners for push notifications from the server
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_INIT, self.onResInit );
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_CREATE_GAME, self.onResGameCreate );
@@ -77,9 +83,6 @@ app.factory( 'LobbyModel', [
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_PLAYER_REMOVE, self.onPushPlayerRemove );
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_PLAYER_UPDATE, self.onPushPlayerUpdate );
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_START_PLAYING, self.onPushStartPlaying );
-
-        // Request to the server to deliver the inital lobby state.
-        self.requestInit( player );
 
       },
 

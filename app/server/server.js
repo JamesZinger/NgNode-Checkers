@@ -11,8 +11,8 @@ server.listen( 3000 );
 
 app.get('/', function (req, res)
 {
-	//res.sendfile(path.resolve(__dirname + '/../Client/dist/index.html'));
-	res.sendfile('index.html');
+	res.sendfile(path.resolve(__dirname + '/../Client/app/index.html'));
+	//res.sendfile('index.html');
 });
 
 app.get(/^(.+)$/, function (req, res) 
@@ -40,7 +40,6 @@ function handler (req, res)
 io.sockets.on('connection', function(socket)
 {
 	lobby.AddClient(socket);
-	socket.emit('test', "stuff");
 });
 
 lobby.init(io);

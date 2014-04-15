@@ -335,31 +335,31 @@ app.factory( 'LobbyProtocol', [
         switch ( data.cmd ) {
 
         case self.LOBBY_PUSH_GAME_CREATE:
-          self.notifyListeners( self.registryPushGameCreate, data.data );
+          self.notifyListeners( self.registryPushGameCreate, data );
           break;
 
         case self.LOBBY_PUSH_GAME_REMOVE:
-          self.notifyListeners( self.registryPushGameRemove, data.data );
+          self.notifyListeners( self.registryPushGameRemove, data );
           break;
 
         case self.LOBBY_PUSH_GAME_UPDATE:
-          self.notifyListeners( self.registryPushGameUpdate, data.data );
+          self.notifyListeners( self.registryPushGameUpdate, data );
           break;
 
         case self.LOBBY_PUSH_PLAYER_CREATE:
-          self.notifyListeners( self.registryPushPlayerCreate, data.data );
+          self.notifyListeners( self.registryPushPlayerCreate, data );
           break;
 
         case self.LOBBY_PUSH_PLAYER_REMOVE:
-          self.notifyListeners( self.registryPushPlayerRemove, data.data );
+          self.notifyListeners( self.registryPushPlayerRemove, data );
           break;
 
         case self.LOBBY_PUSH_PLAYER_UPDATE:
-          self.notifyListeners( self.registryPushPlayerUpdate, data.data );
+          self.notifyListeners( self.registryPushPlayerUpdate, data );
           break;
 
         case self.LOBBY_PUSH_START_PLAYING:
-          self.notifyListeners( self.registryPushStartPlaying, data.data );
+          self.notifyListeners( self.registryPushStartPlaying, data );
           break;
 
         default:
@@ -386,38 +386,37 @@ app.factory( 'LobbyProtocol', [
       res.request = associatedRequest;
 
       // Remove the request from the stored requests since it's no longer needed
-      var index = self.sentRequests.indexOf( associatedRequest );
-      self.sentRequests.splice( index, 1 );
+      delete self.sentRequests[ res.id ];
 
       // If a request matched interpret the request's command but pass the response's data
       switch ( associatedRequest.cmd ) {
 
         case self.LOBBY_REQ_INIT:
-        self.notifyListeners( self.registryPushGameCreate, res.data );
+        self.notifyListeners( self.registryResInit, res );
         break;
 
         case self.LOBBY_REQ_CREATE_GAME:
-          self.notifyListeners( self.registryResGameCreate, res.data );
+          self.notifyListeners( self.registryResGameCreate, res );
           break;
 
         case self.LOBBY_REQ_JOIN_GAME:
-          self.notifyListeners( self.registryResGameJoin, res.data );
+          self.notifyListeners( self.registryResGameJoin, res );
           break;
 
         case self.LOBBY_REQ_LEAVE_GAME:
-          self.notifyListeners( self.registryResGameLeave, res.data );
+          self.notifyListeners( self.registryResGameLeave, res );
           break;
 
         case self.LOBBY_REQ_SET_NAME:
-          self.notifyListeners( self.registryResSetName, res.data );
+          self.notifyListeners( self.registryResSetName, res );
           break;
 
         case self.LOBBY_REQ_SET_READY:
-          self.notifyListeners( self.registryResSetReady, res.data );
+          self.notifyListeners( self.registryResSetReady, res );
           break;
 
         case self.LOBBY_REQ_SET_WAITING:
-          self.notifyListeners( self.registryResSetWaiting, res.data );
+          self.notifyListeners( self.registryResSetWaiting, res );
           break;
 
         default:

@@ -29,19 +29,22 @@ app.factory( 'PlayerModel', [
       // The name of the player typed in when they log in on the homepage.
       name: '',
 
-      // The lobby that the player is participating in
+      // The lobby that the player is participating in.
       lobby: null,
 
       // The state of the player in the lobby (LOBBY_STATE_AVAILABLE or 
       // LOBBY_STATE_PLAYING).
-      lobbyState: self.LOBBY_STATE_AVAILABLE,
+      lobbyState: 'Available',
 
-      // A reference to a game in the lobby that the player currently belongs to
+      // A reference to a game in the lobby that the player currently belongs to.
       gameLobby: null,
+
+      // A reference to the player object contained by the lobby game.
+      playerLobby: null,
 
       // If the player is in a game, the index of this player in the game's player list.
       // Note: If the player is not in a game, this should be LOBBY_INDEX_NO_GAME.
-      gameLobbyIndex: self.LOBBY_INDEX_NO_GAME,
+      gameLobbyIndex: -1,
 
       // A reference to the game state of the game in progress
       game: null,
@@ -60,7 +63,7 @@ app.factory( 'PlayerModel', [
         self.lobby = lobby;
 
         // Request that the lobby model assign a random scientist name to the player
-        self.lobby.requestSetName( self, '' );
+        self.lobby.requestSetName( '' );
 
       },
 
@@ -73,7 +76,7 @@ app.factory( 'PlayerModel', [
       requestCreateGame: function () {
 
         $log.info( 'PlayerModel.requestCreateGame()' );
-        self.lobby.requestCreateGame( self );
+        self.lobby.requestGameCreate();
 
       },
 
@@ -82,7 +85,7 @@ app.factory( 'PlayerModel', [
       requestJoinGame: function ( hostName ) {
 
         $log.info( 'PlayerModel.requestJoinGame()' );
-        self.lobby.requestJoinGame( self, hostName );
+        self.lobby.requestGameJoin( hostName );
 
       },
 
@@ -92,7 +95,7 @@ app.factory( 'PlayerModel', [
       requestLeaveGame: function () {
 
         $log.info( 'PlayerModel.requestLeaveGame()' );
-        self.lobby.requestLeaveGame( self );
+        self.lobby.requestGameLeave();
 
       },
 
@@ -102,7 +105,7 @@ app.factory( 'PlayerModel', [
       requestSetName: function ( newName ) {
 
         $log.info( 'PlayerModel.requestSetName()' );
-        self.lobby.requestSetName( self, newName );
+        self.lobby.requestSetName( newName );
 
       },
 
@@ -111,7 +114,7 @@ app.factory( 'PlayerModel', [
       requestSetReady: function () {
 
         $log.info( 'PlayerModel.requestSetReady()' );
-        self.lobby.requestSetReady( self );
+        self.lobby.requestSetReady();
 
       },
 
@@ -120,7 +123,7 @@ app.factory( 'PlayerModel', [
       requestSetWaiting: function () {
 
         $log.info( 'PlayerModel.requestSetWaiting()' );
-        self.lobby.requestSetWaiting( self );
+        self.lobby.requestSetWaiting();
 
       },
 
@@ -129,7 +132,7 @@ app.factory( 'PlayerModel', [
       requestMovePiece: function ( piece, x, y ) {
 
         $log.info( 'PlayerModel.requestMovePiece()' );
-        self.game.requestMovePiece( self, piece, x, y );
+        self.game.requestMovePiece( piece, x, y );
 
       },
 
@@ -147,6 +150,7 @@ app.factory( 'PlayerModel', [
         // list and switch the player's state to LOBBY_STATE_PLAYING.
         self.gameLobby = game;
         self.gameLobbyIndex = game.players.length - 1;
+        self.playerLobby = self.gameLobbyIndex;
         self.lobbyState = self.LOBBY_STATE_PLAYING;
 
       },
@@ -161,6 +165,7 @@ app.factory( 'PlayerModel', [
         // list and switch the player's state to LOBBY_STATE_AVAILABLE.
         self.gameLobby = null;
         self.gameLobbyIndex = self.LOBBY_INDEX_NO_GAME;
+        self.playerLobby = null;
         self.state = self.LOBBY_STATE_AVAILABLE;
 
       },
@@ -174,6 +179,11 @@ app.factory( 'PlayerModel', [
         // Set the player's name
         self.name = newName;
 
+        // If the player is in a game, change the player's name there too
+        if ( self.playerLobby !== null ) {
+          self.playerLobby.name = newName;
+        }
+
       },
 
       // onSetReady() is called in response to the lobby model approving the
@@ -184,7 +194,7 @@ app.factory( 'PlayerModel', [
         $log.info( 'PlayerModel.onSetReady()' );
 
         // Set readiness in the game to LOBBY_READINESS_READY
-        self.gameLobby.players[ self.gameLobbyIndex ].ready = self.LOBBY_READINESS_READY;
+        self.playerLobby.ready = self.LOBBY_READINESS_READY;
 
       },
 
@@ -196,7 +206,7 @@ app.factory( 'PlayerModel', [
         $log.info( 'PlayerModel.onSetWaiting()' );
 
         // Set readiness in the game to LOBBY_READINESS_WAITING
-        self.gameLobby.players[ self.gameLobbyIndex ].ready = self.LOBBY_READINESS_WAITING;
+        self.playerLobby.ready = self.LOBBY_READINESS_WAITING;
 
       },
 
