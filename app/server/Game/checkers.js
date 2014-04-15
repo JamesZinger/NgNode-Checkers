@@ -495,33 +495,33 @@ function Board()
 	this.pieces	= new Array(2);
 	this.tiles	= new Array(8);
 
-	for (var i = 0; i < tiles.length; i++)
+	for (var i = 0; i < this.tiles.length; i++)
 	{
-		tiles[i] = new Array(8);
+		this.tiles[i] = new Array(8);
 		var isRowEven = (i % 2 === 0);
-		for (var j = 0; j < tiles[i].length; j++)
+		for (var j = 0; j < this.tiles[i].length; j++)
 		{
 			isColEven = (j % 2 === 0);
 
-			tiles[i][j] = new tile(i,j);
+			this.tiles[i][j] = new this.tile(i,j);
 
 			var xor = (isRowEven ^ isColEven) === 1;
 			if (xor)
-				tiles[i][j].isMoveable = false;
+				this.tiles[i][j].isMoveable = false;
 			else
-				tiles[i][j].isMoveable = true;
+				this.tiles[i][j].isMoveable = true;
 
 		}
 	}
 
-	for (i = 0; i < pieces.length; i++)
+	for (i = 0; i < this.pieces.length; i++)
 	{
-		pieces[i] = new Array(12);
+		this.pieces[i] = new Array(12);
 
 		for (var k = 0; k < pieces[k].length; k++)
 		{
 			var loc = PIECE_MAP[i][k];
-			pieces[i][k] = new Piece(i,tiles[loc.x][loc.y], k);
+			this.ieces[i][k] = new Piece(i,tiles[loc.x][loc.y], k);
 		}
 	}
 }
