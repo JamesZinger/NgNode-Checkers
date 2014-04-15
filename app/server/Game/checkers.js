@@ -34,15 +34,36 @@ function Checkers(game)
 		for (var i = 0; i < board.length; i++)
 		{
 			board[i] = new Array(8);
-			for (var j = 0; j < board[i].length; j++)
+			for (var k = 0; k < board[i].length; k++)
 			{
-				board[i][j] = null;
+				board[i][k] = null;
 			}
 		}
 
-		for (i = 0; i < self.board.length; i++)
+		for (i = 0; i < self.board.pieces.length; i++)
 		{
-			
+			for (var j = 0; j < self.board.pieces[i].length; j++)
+			{
+				var piece			= self.board.pieces[i][j];
+				var retPiece		= {};
+				var pieceIdentifier	= "";
+
+				if		(piece.teamNumber === 0)
+				{
+					pieceIdentifier = "B" + piece.id;
+				}
+				else if	(piece.teamNumber === 1)
+				{
+					pieceIdentifier = "R" + piece.id;
+				}
+
+				retPiece.id		= pieceIdentifier;
+				retPiece.x		= piece.x;
+				retPiece.y		= piece.y;
+				retPiece.king	= piece.isKing;
+
+				board[piece.x][piece.y] = retPiece;
+			}
 		}
 
 		gameState.board = board;
@@ -59,8 +80,6 @@ function Checkers(game)
 			{
 				self.request(client.cl_socket, data);
 			});
-
-
 
 			gameState.playerColour = i;
 

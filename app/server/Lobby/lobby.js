@@ -525,20 +525,24 @@ function onDisconnect(socket)
 			{
 				if (Games[key].id === client.gameId)
 				{
-					gameContext = Games[key];
+					gameContext0 = Games[key];
 				}
 			}
 		}
-
-		var isGameDeleted = gameContext.leaveGame(client);
-		if (isGameDeleted === true)
+		if('undefined' != typeof gameContext)
 		{
+			var isGameDeleted = gameContext.leaveGame(client);
+			if (isGameDeleted === true)
+			{
+				pushGameClosed(game);
+				delete Games[game.gameName];
+			}
+			else
+			{
+				pushGameUpdated(game);
+			}
 			pushGameClosed(gameContext);
 			delete Games[gameContext.gameName];
-		}
-		else
-		{
-			pushGameUpdated(gameContext);
 		}
 	
 	}
