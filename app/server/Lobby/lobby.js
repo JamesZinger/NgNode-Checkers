@@ -542,7 +542,17 @@ function onDisconnect(socket)
 			}
 		}
 
-		gameContext.leaveGame(client);
+		var isGameDeleted = gameContext.leaveGame(client);
+		if (isGameDeleted === true)
+		{
+			pushGameClosed(game);
+			delete Games[game.gameName];
+		}
+		else
+		{
+			pushGameUpdated(game);
+		}
+	
 	}
 
 	delete Clients[socket.id];
