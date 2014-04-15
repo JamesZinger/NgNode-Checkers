@@ -53,13 +53,14 @@ function Game(client)
 
 	this.update = function()
 	{
-		var ready = true;
+		var ready = 0;
 		for (var i = 0; i < self.players.length; i++)
 		{
-			ready = (self.players[i].isReady && ready);
+			if (self.players[i].isReady === true)
+				ready++;
 		}
 
-		if(ready === true)
+		if(ready === 2)
 		{
 			self.onGameStart();
 		}
@@ -68,6 +69,7 @@ function Game(client)
 	this.onGameStart = function ()
 	{
 		self.gameRef = checkers_template.CreateGame(self);
+		self.gameRef.init();
 		for (var i = 0; i < self.players.length; i++)
 		{
 			self.players[i].isPlaying = true;

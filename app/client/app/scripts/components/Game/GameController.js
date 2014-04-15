@@ -20,7 +20,8 @@ app.controller( 'GameController', [
     // Check for an existing checkers game model inside the scope
     if ( $rootScope.player.game === null ) {
       $rootScope.player.game = CheckersModel;
-      $rootScope.player.game.init( 960, 540, angular.element( '#game-scene' ) );
+      $rootScope.player.game.init( $rootScope.gameState, 1080, 608, angular.element( '#game-scene' ) );
+      $rootScope.gameState = null;
       $rootScope.player.game.render();
     }
 

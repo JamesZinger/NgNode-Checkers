@@ -315,7 +315,7 @@ function setReady(clientContext, reqId)
 
 	pushGameUpdated(gameContext, clientContext);
 
-	setTimeout(gameContext.update, 500);
+	gameContext.update();
 
 	return {
 		approved: true,
