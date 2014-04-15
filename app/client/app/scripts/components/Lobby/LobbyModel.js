@@ -43,6 +43,9 @@ app.factory( 'LobbyModel', [
       // The lobby game list
       games: null,
 
+      // Counter to keep track of the number of initializion attempts made so far
+      initAttempts: 0,
+
       // Callback registries for important events
       registryInitFailed: [],
       registryInitSuccess: [],
@@ -62,6 +65,9 @@ app.factory( 'LobbyModel', [
         // Store the player
         self.player = player;
 
+        // Set initAttempts to 0
+        self.initAttempts = 0;
+
         // Register event listeners for push notifications from the server
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_INIT, self.onResInit );
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_CREATE_GAME, self.onResGameCreate );
@@ -77,9 +83,6 @@ app.factory( 'LobbyModel', [
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_PLAYER_REMOVE, self.onPushPlayerRemove );
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_PLAYER_UPDATE, self.onPushPlayerUpdate );
         LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_START_PLAYING, self.onPushStartPlaying );
-
-        // Request to the server to deliver the inital lobby state.
-        self.requestInit( player );
 
       },
 
@@ -284,7 +287,7 @@ app.factory( 'LobbyModel', [
         } else {
 
           // Init was successful
-          self.onInitSuccess( res );
+          self.onInitSuccess( res.data );
 
         }
 
@@ -375,7 +378,7 @@ app.factory( 'LobbyModel', [
         } else {
 
           // Name change approved
-          self.onSetNameSuccess( res );
+          self.onSetNameSuccess( res.data );
 
         }
 
@@ -432,17 +435,16 @@ app.factory( 'LobbyModel', [
 
       // onInitSuccess() is called when requestInit() recieves back an initialization
       // data packet from the server to configure the
-      onInitSuccess: function ( res ) {
+      onInitSuccess: function ( initialLobbyState ) {
 
         $log.info( 'LobbyModel.onInitSuccess()' );
 
         // Use the players and games arrays sent from the server
-        var initialLobbyState = res.data;
         self.players = initialLobbyState.players;
         self.games = initialLobbyState.games;
 
         // Call each of the functions registered as listeners for this event
-        self.notifyListeners( self.registryInitSuccess, null );
+        self.notifyListeners( self.registryInitSuccess, initialLobbyState );
 
       },
 
@@ -460,16 +462,15 @@ app.factory( 'LobbyModel', [
 
       // onSetNameSuccess() is called when requestSetName() is successful. This should
       // result in a screen change from the homepage to the lobby.
-      onSetNameSuccess: function ( res ) {
+      onSetNameSuccess: function ( newName ) {
 
         $log.info( 'LobbyModel.onSetNameSuccess()' );
 
         // Change the player's name
-        var newName = res.data;
         self.player.onSetName( newName );
 
         // Call each of the functions registered as listeners for this event
-        self.notifyListeners( self.registrySetNameSuccess, null );
+        self.notifyListeners( self.registrySetNameSuccess, newName );
 
       },
 

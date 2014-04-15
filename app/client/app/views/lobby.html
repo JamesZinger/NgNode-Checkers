@@ -3,11 +3,11 @@
     <div class="row">
       <div class="col-md-3 sidebar">
         <h3>Actions</h3>
-        <a class="action-button btn btn-lg btn-info" ng-click="onCreateGame( $event )" ng-show="player.gameLobby === null">Create Game</a>
-        <a class="action-button btn btn-lg btn-default" ng-click="onCancelGameAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ 0 ].name === player.name">Cancel Game</a>
-        <a class="action-button btn btn-lg btn-default" ng-click="onLeaveGameAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ 0 ].name !== player.name">Leave Game</a>
-        <a class="action-button btn btn-lg btn-success" ng-click="onReadyAction( $event )" ng-show="player.gameLobby !== null && !player.gameLobby.players[ player.index ].ready">Ready To Play!</a>
-        <a class="action-button btn btn-lg btn-danger" ng-click="onWaitAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ player.index ].ready">Wait Up!</a>
+        <a class="action-button btn btn-lg btn-info" ng-click="onCreateGameAction( $event )" ng-show="player.gameLobby === null">Create Game</a>
+        <a class="action-button btn btn-lg btn-default" ng-click="onCancelGameAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ 0 ] === player.playerLobby">Cancel Game</a>
+        <a class="action-button btn btn-lg btn-default" ng-click="onLeaveGameAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ 0 ] !== player.playerLobby">Leave Game</a>
+        <a class="action-button btn btn-lg btn-success" ng-click="onReadyAction( $event )" ng-show="player.gameLobby !== null && !player.playerLobby.ready">Ready To Play!</a>
+        <a class="action-button btn btn-lg btn-danger" ng-click="onWaitAction( $event )" ng-show="player.gameLobby !== null && player.playerLobby.ready">Wait Up!</a>
         <hr />
         <h3>Players</h3>
         <input type="text" class="form-control" placeholder="Filter for a player" ng-model="filterPlayersName">
@@ -20,13 +20,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="lobby-player" ng-repeat="otherPlayer in lobby.players | filter: { name: filterPlayersName }">
+            <tr class="lobby-player" ng-repeat="otherPlayer in player.lobby.players | filter: { name: filterPlayersName }">
               <td class="player-name">
                 {{ otherPlayer.name }}
               </td>
               <td class="player-state">
                 <span class="label label-success" ng-show="otherPlayer.state == 'Available'">Available</span>
-                <span class="label label-warning" ng-show="otherPlayer.state == 'Invited'">Invited</span>
                 <span class="label label-danger" ng-show="otherPlayer.state == 'Playing'">Playing</span>
               </td>
             </tr>
@@ -62,7 +61,7 @@
           <h2>Join a Game</h2>
           <input type="text" class="form-control" placeholder="Filter for a game using the name of a joined player" ng-model="filterGamesName">
           <ul class="lobby-games">
-            <li class="list-repeat" ng-repeat="game in lobby.games | filter: { players: filterGamesName }" ng-hide="game.players[ 0 ].name === player.name">
+            <li class="list-repeat" ng-repeat="game in player.lobby.games | filter: { players: filterGamesName }" ng-hide="game.players[ 0 ].name === player.name">
               <div class="lobby-game well">
                 <h4>{{ game.players[ 0 ].name }}'s Checkers Game</h4>
                 <div class="game-type game-type-checkers"><img src="images/checkers-board-iso_sm.png" /></div>

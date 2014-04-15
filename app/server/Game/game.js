@@ -10,7 +10,7 @@ function Game(client)
 	var self      = this;
 	this.gameRef  = null;
 
-	players.push(client);
+	this.players.push(client);
 
 	game_id_counter++;
 

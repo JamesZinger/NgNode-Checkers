@@ -2,8 +2,13 @@
 'use strict';
 
 app.controller( 'LobbyController', [
-  '$rootScope', '$scope', '$log',
-  function ( $rootScope, $scope, $log ) {
+  '$rootScope', '$scope', '$log', '$location',
+  function ( $rootScope, $scope, $log, $location ) {
+
+    // Redirect to the home page if not initialized yet
+    if ( !$rootScope.initialized ) {
+      $location.path( 'home' );
+    }
 
     // Change the nav button to highlight this page in the navbar
     angular.element( '.navbar-nav > li' ).removeClass( 'active' );
@@ -20,7 +25,6 @@ app.controller( 'LobbyController', [
     $scope.onCancelGameAction = function () {
 
       $log.info( 'LobbyController.onCancelGameAction()' );
-
       $rootScope.player.requestLeaveGame();
 
     };
@@ -29,7 +33,6 @@ app.controller( 'LobbyController', [
     $scope.onCreateGameAction = function () {
 
       $log.info( 'LobbyController.onCreateGameAction()' );
-
       $rootScope.player.requestCreateGame();
 
     };
@@ -52,7 +55,6 @@ app.controller( 'LobbyController', [
     $scope.onLeaveGameAction = function () {
 
       $log.info( 'LobbyController.onLeaveGameAction()' );
-
       $rootScope.player.requestLeaveGame();
 
     };
@@ -61,7 +63,6 @@ app.controller( 'LobbyController', [
     $scope.onReadyAction = function () {
 
       $log.info( 'LobbyController.onReadyAction()' );
-
       $rootScope.player.requestSetReady();
 
     };
@@ -70,7 +71,6 @@ app.controller( 'LobbyController', [
     $scope.onWaitingAction = function () {
 
       $log.info( 'LobbyController.onWaitingAction()' );
-
       $rootScope.player.requestSetWaiting();
 
     };
