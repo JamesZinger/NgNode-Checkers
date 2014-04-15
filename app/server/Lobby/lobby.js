@@ -504,6 +504,23 @@ function onDisconnect(socket)
 	pushPlayerDisconnect(client);
 	var name = client.name;
 
+	if (client.isInGame === true)
+	{
+		var gameContext;
+
+		//Leave the game
+		for (var i = 0; i < Games.length; i++)
+		{
+			if (Games[i].id === gameId)
+			{
+				gameContext = Games[i];
+			}
+		
+		}
+
+		gameContext.leaveGame(client);
+	}
+
 	delete Clients[socket.id];
 	delete NamedClients[name];
 }

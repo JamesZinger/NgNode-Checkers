@@ -17,27 +17,59 @@ function Checkers(game)
 	if ('undefined' == typeof game)
 		return;
 
-	var self = this;
-
-	this.board = new Board();
-	this.game = game;
-
-	this.players = [];
-
-	this.currentTurn = 0;
+	var self			= this;
+	this.board			= new Board();
+	this.game			= game;
+	this.players		= [];
+	this.sockmap		= {};
+	this.currentTurn	= 0;
 
 	this.init = function()
 	{
-		for (var i = 0; i < self.game.players.length; i++)
+		var gameState = {};
+		gameState.turn = currentTurn;
+
+		var board = new Array(8);
+
+		for (var i = 0; i < board.length; i++)
+		{
+			board[i] = new Array(8);
+			for (var j = 0; j < board[i].length; j++)
+			{
+				board[i][j] = null;
+			}
+		}
+
+		for (i = 0; i < self.board.length; i++)
+		{
+			
+		}
+
+		gameState.board = board;
+
+		for (i = 0; i < self.game.players.length; i++)
 		{
 			var client = self.game.players[i];
+			var player = new Player(client, i);
+			self.players.push(player);
 
-			self.players[client.cl_socket] = new Player(client, i);
-			
+			self.sockmap[client.cl_socket.id] = player;
+
 			client.cl_socket.on('game', function(data)
 			{
 				self.request(client.cl_socket, data);
 			});
+
+
+
+			gameState.playerColour = i;
+
+			ret = {};
+			ret.cmd = 'SP';
+			ret.data = gameState;
+
+			client.cl_socket.emit('lobby', ret);
+
 		}
 	};
 
@@ -62,7 +94,7 @@ function Checkers(game)
 			switch(data.cmd)
 			{
 			case 'M':
-				res = movePieceRequest(self.players[socket], data, self.board);
+				res = movePieceRequest(self.sockmap[socket], data, self.board);
 				break;
 
 			default:
@@ -74,7 +106,7 @@ function Checkers(game)
 			}
 		}
 
-		socket.emit(res);
+		socket.emit('game', res);
 	};
 
 	this.movePieceRequest = function(player, data, board)
@@ -127,29 +159,147 @@ function Checkers(game)
 
 	};
 
-	this.pushPieceMoved = function(piece)
+	this.switchTurn = function()
 	{
 
+
+		if (currentTurn === 0)
+		{
+			currentTurn = 1;
+		}
+		else if (currentTurn === 1)
+		{
+			currentTurn = 0;
+		}
+
+		pushTurnSwitched();
+	};
+
+	this.pushPieceMoved = function(piece)
+	{
+		var pieceIdentifier;
+
+		if (currentTurn === 0)
+		{
+			pieceIdentifier = "B" + piece.id;
+		}
+		else
+		{
+			pieceIdentifier = "R" + piece.id;
+		}
+
+		req = {
+			cmd: 'P',
+			data: {
+				piece: pieceIdentifier,
+				x: piece.x,
+				y: piece.y
+			}
+		};
 	};
 
 	this.pushPieceKilled = function(piece)
 	{
 
+		var pieceIdentifier;
+
+		if (currentTurn === 0)
+		{
+			pieceIdentifier = "B" + piece.id;
+		}
+		else
+		{
+			pieceIdentifier = "R" + piece.id;
+		}
+
+		req = {
+			cmd: 'D',
+			data: {
+				piece: pieceIdentifier,
+			}
+		};
 	};
 
 	this.pushKingedPiece = function(piece)
 	{
+		var pieceIdentifier;
 
+		if (currentTurn === 0)
+		{
+			pieceIdentifier = "B" + piece.id;
+		}
+		else
+		{
+			pieceIdentifier = "R" + piece.id;
+		}
+
+		req = {
+			cmd: 'K',
+			data: {
+				piece: pieceIdentifier,
+			}
+		};
 	};
 
 	this.pushTurnSwitched = function()
 	{
+		var player = self.players[currentTurn];
+		req = {
+			cmd: 'B',
+			data: players.client.name
+		};
 
+		var reqPlayer;
+
+		if (currentTurn === 0)
+		{
+			reqPlayer = self.players[1];
+		}
+		else if (currentTurn === 1)
+		{
+			reqPlayer = self.players[0];
+		}
+
+		self.sendPushRequestToOtherPlayer(req, reqPlayer);
 	};
 
-	this.pushGameOver = function()
+	this.pushGameOver = function(winnerNumber)
 	{
 
+		var team;
+		if (winnerNumber === 1)
+			team = "red";
+		else if (winnerNumber === 0)
+			team = "black";
+
+		req = {
+			cmd: 'GO',
+			data: team
+		};
+
+		var reqPlayer;
+
+		for (var i = 0; i < self.players.length; i++) 
+		{
+			self.players[i].client.cl_socket.emit('game', req);
+			self.players[i].client.cl_socket.removeAllListeners('game');
+		}
+		self.game.onGameEnded();
+	};
+
+	this.sendPushRequestToOtherPlayer = function(req, player)
+	{
+		var socket;
+		if (currentTurn === 0)
+		{
+			socket = self.players[1].client.cl_socket;
+		}
+		else if (currentTurn === 1)
+		{
+			socket = self.players[0].client.cl_socket;
+		}
+
+		socket.emit('game', req);
 	};
 }
 
@@ -170,11 +320,13 @@ function Piece(teamNumber, tile, id)
 
 	this.kill = function(checkers)
 	{
+		checkers.board[self.teamNumber].splice(self.id, 1);
 		checkers.pushPieceKilled(self);
 	};
 
 	this.king = function(checkers)
 	{
+		this.isKing = true;
 		checkers.pushKingedPiece(self);
 	};
 
@@ -239,8 +391,47 @@ function Piece(teamNumber, tile, id)
 
 		}
 
-		tile.movePieceOn(self);
-		checkers.pushPieceMoved(piece);
+		// Vaild Move and No Piece is there
+		else
+		{
+			tile.movePieceOn(self);
+			checkers.pushPieceMoved(piece);
+
+			if (self.checkIfShouldKing() === true)
+			{
+				self.king();
+			}
+
+			checkers.switchTurn();
+
+			return {
+				approved: true,
+				data: {
+					endTurn: true
+				},
+				id: data.id
+			};
+		}
+	};
+
+	this.checkIfShouldKing = function()
+	{
+		if (self.isKing === true)
+			return false;
+
+		if (self.teamNumber === 1)
+		{
+			if (self.y === 0)
+				return true;
+		}
+
+		else if (self.teamNumber === 0)
+		{
+			if (self.y === 7)
+				return true;
+		}
+
+		return false;
 	};
 }
 
@@ -311,7 +502,7 @@ function Board()
 		for (var k = 0; k < pieces[k].length; k++)
 		{
 			var loc = PIECE_MAP[i][k];
-			pieces[i][k] = new Piece(i,tiles[loc.x][loc.y]);
+			pieces[i][k] = new Piece(i,tiles[loc.x][loc.y], k);
 		}
 	}
 }
@@ -321,8 +512,8 @@ function Player(client, teamNumber)
 	if ('undefined' == typeof client || 'undefined' == typeof teamNumber)
 		return;
 
-	this.teamNumber = teamNumber;
-	this.client = client;
+	this.teamNumber	= teamNumber;
+	this.client		= client;
 }
 
 exports.CreateGame = function( game )

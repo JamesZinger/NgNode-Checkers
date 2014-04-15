@@ -20,23 +20,6 @@ app.get(/^(.+)$/, function (req, res)
 	res.sendfile(path.resolve(__dirname + '/../Client/app/' + req.path));
 });
 
-function handler (req, res)
-{
-	fs.readFile(__dirname + '/../Client/app/' + req.url,
-		function (err, data)
-		{
-			if (err)
-			{
-				res.writeHead( 500 );
-				return res.end('Error loading requested file');
-			}
-
-			res.writeHead( 200 );
-			res.end(data);
-		}
-	);
-}
-
 io.sockets.on('connection', function(socket)
 {
 	lobby.AddClient(socket);

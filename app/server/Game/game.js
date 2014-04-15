@@ -5,9 +5,10 @@ var game_id_counter = 1;
 function Game(client)
 {
 	this.id       = game_id_counter;
-	this.gameName = name;
+	this.gameName = client.name;
 	this.players  = [];
 	var self      = this;
+	this.gameRef  = null;
 
 	players.push(client);
 
@@ -21,6 +22,9 @@ function Game(client)
 		var index = players.indexOf(client);
 		self.players.splice(index,1);
 		
+		client.isInGame = false;
+		cliient.gameId = -1;
+
 		if (players.length === 0)
 			return true;
 		else 
@@ -34,6 +38,8 @@ function Game(client)
 
 		if(self.players.length === 1)
 		{
+			client.isInGame = true;
+			client.gameId = self.id;
 			self.players.push(client);
 			return true;
 		}
@@ -45,15 +51,18 @@ function Game(client)
 
 	this.onGameStart = function ()
 	{
-		checkers_template.CreateGame(self);
-		for (var i = 0; i < self.players.length; i++) {
+		self.gameRef = checkers_template.CreateGame(self);
+		for (var i = 0; i < self.players.length; i++)
+		{
 			self.players[i].isPlaying = true;
 		}
 	};
 
 	this.onGameEnded = function ()
 	{
-		for (var i = 0; i < self.players.length; i++) {
+		delete self.gameRef;
+		for (var i = 0; i < self.players.length; i++)
+		{
 			self.players[i].isPlaying = false;
 		}
 	};
