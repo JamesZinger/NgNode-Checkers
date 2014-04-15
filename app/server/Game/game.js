@@ -5,11 +5,11 @@ var game_id_counter = 1;
 function Game(client)
 {
 	this.id       = game_id_counter;
-	this.gameName = name;
+	this.gameName = client.name;
 	this.players  = [];
 	var self      = this;
 
-	players.push(client);
+	this.players.push(client);
 
 	game_id_counter++;
 

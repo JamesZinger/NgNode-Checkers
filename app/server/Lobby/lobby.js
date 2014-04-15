@@ -1,6 +1,6 @@
 var fs = require('fs');
 var cl_template = require('./client.js');
-var game_template = require('./../Game/checkers.js');
+var game_template = require('./../Game/game.js');
 var Clients = [];
 var Games = [];
 var NamedClients = [];
@@ -145,10 +145,17 @@ function createGame(clientContext, reqId)
 	pushGameCreated(game);
 	pushPlayerUpdate(clientContext);
 
-	return {
-		approved: true,
-		id: reqId
+	var ret = {};
+	ret.approved = true;
+	ret.id = reqId;
+	ret.data = {};
+	ret.data.players = [];
+	var player = {
+		name: clientContext.name,
+		state: clientContext.isReady
 	};
+	ret.data.players.push(player);
+	return ret;
 }
 
 function leaveGame(clientContext, reqId)
@@ -496,7 +503,7 @@ function lobbyInit(clientContext, reqId)
 				gamePlayer.ready = Games[key].players[j].isReady;
 				game.players.push(gamePlayer);
 			}
-			ret.data.Games.push(game);
+			ret.data.games.push(game);
 		}
 	}
 	
