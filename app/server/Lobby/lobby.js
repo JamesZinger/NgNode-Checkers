@@ -199,7 +199,7 @@ function leaveGame(clientContext, reqId)
 	}
 	else
 	{
-		pushGameUpdated(gameContext);
+		pushGameUpdated(gameContext, clientContext);
 	}
 
 
@@ -245,12 +245,21 @@ function joinGame(clientContext, data, reqId)
 		clientContext.isInGame = true;
 		clientContext.gameId = gameContext.id;
 
-		pushGameUpdated(gameContext);
+		pushGameUpdated(gameContext, clientContext);
 
-		return {
-			approved: true,
-			id: reqId
-		};
+		var ret = {};
+		ret.approved = true;
+		ret.id = reqId;
+		ret.data = {};
+		ret.data.players = [];
+		for (var i = 0; i < gameContext.players.length; i++)
+		{
+			var player = {};
+			player.name = gameContext.players[i].name;
+			player.state = gameContext.players[i].isReady;
+			ret.data.players.push(player);
+		}
+		return ret;
 	}
 	else
 		return{
@@ -304,7 +313,7 @@ function setReady(clientContext, reqId)
 		}
 	}
 
-	pushGameUpdated(gameContext);
+	pushGameUpdated(gameContext, clientContext);
 
 	return {
 		approved: true,
@@ -357,7 +366,7 @@ function setWait(clientContext, reqId)
 		}
 	}
 
-	pushGameUpdated(gameContext);
+	pushGameUpdated(gameContext, clientContext);
 
 	return {
 		approved: true,
@@ -539,7 +548,7 @@ function onDisconnect(socket)
 			}
 			else
 			{
-				pushGameUpdated(gameContext);
+				pushGameUpdated(gameContext, client);
 			}
 		}
 	
@@ -619,7 +628,7 @@ function pushGameClosed(gameContext)
 	sendPushRequestToAllBut(req, null);
 }
 
-function pushGameUpdated(gameContext)
+function pushGameUpdated(gameContext, clientContext)
 {
 	var game = {};
 	game.players = [];
@@ -638,7 +647,7 @@ function pushGameUpdated(gameContext)
 		data: game
 	};
 
-	sendPushRequestToAllBut(req, null);
+	sendPushRequestToAllBut(req, clientContext);
 }
 
 function sendPushRequestToAllBut(req, clientContext)
