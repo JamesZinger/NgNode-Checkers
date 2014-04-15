@@ -34,7 +34,8 @@ function request(socket, data)
 	{
 		res = {
 			approved: false,
-			data: "Error invaild request"
+			data: "Error invaild request",
+			id: data.id
 		};
 	}
 
@@ -48,42 +49,43 @@ function request(socket, data)
 		{
 			//Create Game
 			case 'C':
-				res = createGame(clientContext);
+				res = createGame(clientContext, data.id);
 				break;
 
 			//Leave Game
 			case 'L':
-				res = leaveGame(clientContext);
+				res = leaveGame(clientContext, data.id);
 				break;
 
 			//Join Game
 			case 'J':
-				res = joinGame(clientContext, data.data);
+				res = joinGame(clientContext, data.data, data.id);
 				break;
 
 			//Set Ready
 			case 'R':
-				res = setReady(clientContext);
+				res = setReady(clientContext, data.id);
 				break;
 
 			//Set Wait
 			case 'W':
-				res = setWait(clientContext);
+				res = setWait(clientContext, data.id);
 				break;
 
 			//Set Name
 			case 'N':
-				res = setName(clientContext, data.data);
+				res = setName(clientContext, data.data, data.id);
 				break;
 
 			case 'I':
-				res = lobbyInit(clientContext);
+				res = lobbyInit(clientContext, data.id);
 			break;
 
 			default:
 				res = {
 					approved: false,
-					data: "Error cannot determine command"
+					data: "Error cannot determine command",
+					id: data.id
 				};
 				break;
 		}
@@ -114,7 +116,7 @@ exports.GetClients = function()
 	return Clients;
 };
 
-function createGame(clientContext)
+function createGame(clientContext, reqId)
 {
 	//Check if the player is already in a game
 	if (clientContext.isInGame === true)
@@ -122,6 +124,7 @@ function createGame(clientContext)
 		return {
 			approved: false,
 			data: "Cannot create a game if you are in a game"
+
 		};
 	}
 
@@ -130,7 +133,8 @@ function createGame(clientContext)
 	{
 		return {
 			approved: false,
-			data: "Cannot create a game. client name is invaild"
+			data: "Cannot create a game. client name is invaild",
+			id: reqId
 		};
 	}
 
@@ -142,17 +146,19 @@ function createGame(clientContext)
 	pushPlayerUpdate(clientContext);
 
 	return {
-		approved: true
+		approved: true,
+		id: reqId
 	};
 }
 
-function leaveGame(clientContext)
+function leaveGame(clientContext, reqId)
 {
 	if(clientContext.isInGame === false)
 	{
 		return{
 			approved: false,
-			data: "Cannot leave a game if you are not in a game"
+			data: "Cannot leave a game if you are not in a game",
+			id: reqId
 		};
 	}
 
@@ -160,7 +166,8 @@ function leaveGame(clientContext)
 	{
 		return {
 			approved: false,
-			data: "Cannot leave game. client name is invaild"
+			data: "Cannot leave game. client name is invaild",
+			id: reqId
 		};
 	}
 	
@@ -189,17 +196,19 @@ function leaveGame(clientContext)
 
 	pushPlayerUpdate(clientContext);
 	return{
-		approved: true
+		approved: true,
+		id: reqId
 	};
 }
 
-function joinGame(clientContext, data)
+function joinGame(clientContext, data, reqId)
 {
 	if (clientContext.isInGame === true)
 	{
 		return {
 			approved: false,
-			data: "Cannot join a game if you are in a game"
+			data: "Cannot join a game if you are in a game",
+			id: reqId
 		};
 	}
 
@@ -207,7 +216,8 @@ function joinGame(clientContext, data)
 	{
 		return{
 			approved: false,
-			data: "Cannot join a game if you do not have a name"
+			data: "Cannot join a game if you do not have a name",
+			id: reqId
 		};
 	}
 
@@ -216,7 +226,8 @@ function joinGame(clientContext, data)
 	if (gameId === -1)
 		return{
 			approved: false,
-			data: "Player is not in a game"
+			data: "Player is not in a game",
+			id: reqId
 		};
 
 	var gameContext;
@@ -238,23 +249,26 @@ function joinGame(clientContext, data)
 		pushGameUpdated(gameContext);
 
 		return {
-			approved: true
+			approved: true,
+			id: reqId
 		};
 	}
 	else
 		return{
 			approved: false,
-			data: "Game is either full or dosent exist anymore"
+			data: "Game is either full or dosent exist anymore",
+			id: reqId
 		};
 }
 
-function setReady(clientContext)
+function setReady(clientContext, reqId)
 {
 	if (clientContext.isInGame === false)
 	{
 		return{
 			approved: false,
-			data: "Cannot ready whne you are not in a game"
+			data: "Cannot ready whne you are not in a game",
+			id: reqId
 		};
 	}
 
@@ -262,7 +276,8 @@ function setReady(clientContext)
 	{
 		return {
 			approved: false,
-			data: "Cannot ready if you do not have a name"
+			data: "Cannot ready if you do not have a name",
+			id: reqId
 		};
 	}
 
@@ -270,7 +285,8 @@ function setReady(clientContext)
 	{
 		return {
 			approved: false,
-			data: "Cannot ready if you are already ready"
+			data: "Cannot ready if you are already ready",
+			id: reqId
 		};
 	}
 
@@ -290,18 +306,19 @@ function setReady(clientContext)
 	pushGameUpdated(gameContext);
 
 	return {
-		approved: true
+		approved: true,
+		id: reqId
 	};
-
 }
 
-function setWait(clientContext)
+function setWait(clientContext, reqId)
 {
 	if (clientContext.isInGame === false)
 	{
 		return {
 			approved: false,
-			data: "Must be in a game to be waiting"
+			data: "Must be in a game to be waiting",
+			id: reqId
 		};
 	}
 
@@ -309,7 +326,8 @@ function setWait(clientContext)
 	{
 		return {
 			approved: false,
-			data: "Cannot wait if you do not have a name"
+			data: "Cannot wait if you do not have a name",
+			id: reqId
 		};
 	}
 
@@ -318,7 +336,8 @@ function setWait(clientContext)
 	{
 		return {
 			approved: false,
-			data: "Cannot wait if you are already waiting"
+			data: "Cannot wait if you are already waiting",
+			id: reqId
 		};
 	}
 
@@ -338,17 +357,19 @@ function setWait(clientContext)
 	pushGameUpdated(gameContext);
 
 	return {
-		approved: true
+		approved: true,
+		id: reqId
 	};
 }
 
-function setName(clientContext, data)
+function setName(clientContext, data, reqId)
 {
 	if (clientContext.isInGame === true)
 	{
 		return {
 			approved: false,
-			data: "Cannot change your name if you are in a game"
+			data: "Cannot change your name if you are in a game",
+			id: reqId
 		};
 	}
 
@@ -392,7 +413,8 @@ function setName(clientContext, data)
 
 		return{
 			approved: true,
-			data: name
+			data: name,
+			id: reqId
 		};
 	}
 
@@ -403,7 +425,8 @@ function setName(clientContext, data)
 		{
 			return {
 				approved:false,
-				data: "Name is already taken"
+				data: "Name is already taken",
+				id: reqId
 			};
 		}
 
@@ -417,18 +440,20 @@ function setName(clientContext, data)
 
 		return {
 			approved: true,
-			data: data
+			data: data,
+			id: reqId
 		};
 	}
 }
 
-function lobbyInit(clientContext)
+function lobbyInit(clientContext, reqId)
 {
 	if (clientContext.isInGame === true)
 	{
 		return {
 			approved: false,
-			data: "something very bad happened to the client state. contact help fast"
+			data: "something very bad happened to the client state. contact help fast",
+			id: reqId
 		};
 	}
 
@@ -436,7 +461,8 @@ function lobbyInit(clientContext)
 	{
 		return {
 			approved: false,
-			data: "get the lobby if you do not have a name"
+			data: "get the lobby if you do not have a name",
+			id: reqId
 		};
 	}
 	var ret = {};
@@ -466,6 +492,8 @@ function lobbyInit(clientContext)
 		ret.Games.push(game);
 	}
 
+
+	ret.id = reqId;
 	clientContext.isInitalized = true;
 	return ret;
 }
