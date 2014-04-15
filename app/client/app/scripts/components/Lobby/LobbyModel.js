@@ -8,9 +8,9 @@ app.factory( 'LobbyModel', [
     // Retry calling requestInit() after a delay
     function tryAgain() {
 
-      setTimeout( self.INIT_ATTEMPTS_DELAY, function () {
+      setTimeout( function () {
         self.requestInit();
-      } );
+      }, self.INIT_ATTEMPTS_DELAY );
 
     }
 
@@ -391,15 +391,15 @@ app.factory( 'LobbyModel', [
 
         if ( !res || !res.approved ) {
 
-            // Do nothing?
-            $log.warn( 'LobbyModel.onResSetReady() >> FAILED/DENIED!' );
+          // Do nothing?
+          $log.warn( 'LobbyModel.onResSetReady() >> FAILED/DENIED!' );
 
-          } else {
+        } else {
 
-            // Set the player's readiness in the game to which they belong
-            self.player.onSetReady();
+          // Set the player's readiness in the game to which they belong
+          self.player.onSetReady();
 
-          }
+        }
 
       },
 
@@ -533,10 +533,15 @@ app.factory( 'LobbyModel', [
         var index = self.indexOfGameByHostPlayerName( updatedGame.players[ 0 ].name );
 
         // Update the game's members using the data package.
-        //self.games[ index ].players = updatedGame.players;
-        for ( var i = 0; i < self.games.length; i++ ) {
-          self.games[ index ].players[ i ].name = updatedGame.players[ i ].name;
-          self.games[ index ].players[ i ].ready = updatedGame.players[ i ].ready;
+        self.games[ index ].players[ 0 ].name = updatedGame.players[ 0 ].name;
+        self.games[ index ].players[ 0 ].ready = updatedGame.players[ 0 ].ready;
+        if ( updatedGame.players.length === 2 ) {
+          if ( self.games[ index ].players.length < updatedGame.players.length ) {
+            self.games[ index ].players.push( updatedGame.players[ 1 ] );
+          } else {
+            self.games[ index ].players[ 1 ].name = updatedGame.players[ 1 ].name;
+            self.games[ index ].players[ 1 ].ready = updatedGame.players[ 1 ].ready;
+          }
         }
 
       },
@@ -544,6 +549,10 @@ app.factory( 'LobbyModel', [
       // onPushPlayerCreate() is called when a push notification is received from the server
       // that a player should be created using the provided data package.
       onPushPlayerCreate: function ( data ) {
+
+        if ( self.players === null ) {
+          return;
+        }
 
         $log.info( 'LobbyModel.onPushPlayerCreate()' );
 

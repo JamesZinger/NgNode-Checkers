@@ -2,6 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-3 sidebar">
+        <h1>{{ player.name }}</h1>
         <h3>Actions</h3>
         <a class="action-button btn btn-lg btn-info" ng-click="onCreateGameAction( $event )" ng-show="player.gameLobby === null">Create Game</a>
         <a class="action-button btn btn-lg btn-default" ng-click="onCancelGameAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ 0 ] === player.playerLobby">Cancel Game</a>
@@ -61,7 +62,7 @@
           <h2>Join a Game</h2>
           <input type="text" class="form-control" placeholder="Filter for a game using the name of a joined player" ng-model="filterGamesName">
           <ul class="lobby-games">
-            <li class="list-repeat" ng-repeat="game in player.lobby.games | filter: { players: filterGamesName }" ng-hide="game.players[ 0 ].name === player.name">
+            <li class="list-repeat" ng-repeat="game in player.lobby.games | filter: { players: filterGamesName }">
               <div class="lobby-game well">
                 <h4>{{ game.players[ 0 ].name }}'s Checkers Game</h4>
                 <div class="game-type game-type-checkers"><img src="images/checkers-board-iso_sm.png" /></div>

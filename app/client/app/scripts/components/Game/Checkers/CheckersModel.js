@@ -91,17 +91,17 @@ app.factory( 'CheckersModel', [
 
       // The attached player's piece colour within the game.
       // Note: Initialized by the game server (onPushStartPlaying).
-      playerColour: self.PLAYER_COLOUR_NEITHER,
+      playerColour: -1,
 
       // The player colour whose turn is currently is (who is allowed to perform moves).
       // Note: Initialized by the game server (onPushStartPlaying).
-      turn: self.PLAYER_COLOUR_NEITHER,
+      turn: -1,
 
       // Is the game been decided yet?
       gameOver: false,
 
       // Which player colour won the game?
-      winner: self.PLAYER_COLOUR_NEITHER,
+      winner: -1,
 
       // A queue of piece moves to be animated by the scene. Each piece move will queue
       // an action here to be lerped by the render loop. Once the animation completes,
