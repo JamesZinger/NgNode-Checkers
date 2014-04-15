@@ -243,7 +243,7 @@ function joinGame(clientContext, data, reqId)
 	if (gameContext.joinGame(clientContext) === true)
 	{
 		clientContext.isInGame = true;
-		clientContext.gameId = gameContext.gameId;
+		clientContext.gameId = gameContext.id;
 
 		pushGameUpdated(gameContext);
 
@@ -525,7 +525,7 @@ function onDisconnect(socket)
 			{
 				if (Games[key].id === client.gameId)
 				{
-					gameContext0 = Games[key];
+					gameContext = Games[key];
 				}
 			}
 		}
@@ -541,8 +541,6 @@ function onDisconnect(socket)
 			{
 				pushGameUpdated(gameContext);
 			}
-			pushGameClosed(gameContext);
-			delete Games[gameContext.gameName];
 		}
 	
 	}
@@ -618,7 +616,7 @@ function pushGameClosed(gameContext)
 		data: gameContext.gameName
 	};
 
-	sendPushRequestToAllBut(req, gameContext.players[0]);
+	sendPushRequestToAllBut(req, null);
 }
 
 function pushGameUpdated(gameContext)
@@ -630,7 +628,7 @@ function pushGameUpdated(gameContext)
 	{
 		var player = {
 			name: gameContext.players[i].name,
-			ready: gameContext.isReady
+			ready: gameContext.players[i].isReady
 		};
 		game.players.push(player);
 	}
@@ -640,7 +638,7 @@ function pushGameUpdated(gameContext)
 		data: game
 	};
 
-	sendPushRequestToAllBut(req, gameContext.players[0]);
+	sendPushRequestToAllBut(req, null);
 }
 
 function sendPushRequestToAllBut(req, clientContext)
