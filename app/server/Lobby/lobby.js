@@ -201,7 +201,7 @@ function leaveGame(clientContext, reqId)
 	{
 		pushGameUpdated(gameContext);
 	}
-	
+
 
 	pushPlayerUpdate(clientContext);
 	return{
@@ -639,6 +639,8 @@ function pushGameUpdated(gameContext)
 		cmd: 'GU',
 		data: game
 	};
+
+	sendPushRequestToAllBut(req, gameContext.players[0]);
 }
 
 function sendPushRequestToAllBut(req, clientContext)
