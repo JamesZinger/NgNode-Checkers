@@ -2,20 +2,20 @@
 'use strict';
 
 app.factory( 'LobbyProtocol', [ 
-  'Socket',
-  function ( Socket ) {
+  '$log', 'Socket',
+  function ( $log, Socket ) {
 
     // init() will be called just prior to returning the lobby protocol object.
     function init() {
 
-      // Register the lobby protocol's interpretPushCommand() function as the callback 
+      // Register the lobby protocol's interpretCommand() function as the callback 
       // for all network events of on the 'lobby' channel.
-      Socket.on( 'lobby', lobbyProtocol.interpretPushCommand );
+      Socket.on( 'lobby', self.interpretCommand );
 
     }
 
     // Create the lobby protocol object
-    var lobbyProtocol = {
+    var self = {
 
       //
       // Constants
@@ -23,8 +23,8 @@ app.factory( 'LobbyProtocol', [
 
       LOBBY_REQ_INIT: 'I',
       LOBBY_REQ_CREATE_GAME: 'C',
-      LOBBY_REQ_LEAVE_GAME: 'L',
       LOBBY_REQ_JOIN_GAME: 'J',
+      LOBBY_REQ_LEAVE_GAME: 'L',
       LOBBY_REQ_SET_NAME: 'N',
       LOBBY_REQ_SET_READY: 'R',
       LOBBY_REQ_SET_WAITING: 'W',
@@ -40,9 +40,23 @@ app.factory( 'LobbyProtocol', [
       // Member Variables
       // 
 
+      // Request ID to keep track of sent requests and match them up with their responses
+      requestID: 0,
+
+      // A map of requestIDs to request data packets that need to be held onto until the
+      // server replies back with a response to resolve the request.
+      sentRequests: {},
+
       // Callback registries for each of the network events
       // These arrays should contain function references to be called in response to 
       // the network event of the associated type being triggered.
+      registryResInit: [],
+      registryResGameCreate: [],
+      registryResGameJoin: [],
+      registryResGameLeave: [],
+      registryResSetName: [],
+      registryResSetReady: [],
+      registryResSetWaiting: [],
       registryPushGameCreate: [],
       registryPushGameRemove: [],
       registryPushGameUpdate: [],
@@ -52,8 +66,45 @@ app.factory( 'LobbyProtocol', [
       registryPushStartPlaying: [],
 
       //
-      // Callback Registration
+      // Observer Pattern
       //
+
+      // deregisterListener() is a convenience function to deregister an event
+      // listener from an event, knowing the array of listeners from which the
+      // callback should be removed.
+      deregisterListener: function ( listeners, callback ) {
+
+        var index = listeners.indexOf( callback );
+        if ( index > 0 ) {
+          listeners.push( callback );
+        }
+
+      },
+
+      // notifyListeners() is a convenience function to perform notification of all
+      // registered listeners by calling each one and passing along the network
+      // event data. Listeners must be an array of callbacks.
+      notifyListeners: function ( listeners, data ) {
+
+        // Call each of the functions registered as listeners for this network event
+        var len = listeners.length;
+        for ( var i = 0; i < len; i++ ) {
+          listeners[ i ]( data );
+        }
+
+      },
+
+      // registerListener() is a convenience function to register an event
+      // listener to an event, knowing the array of listeners from which the
+      // callback should be removed.
+      registerListener: function ( listeners, callback ) {
+
+        var index = listeners.indexOf( callback );
+        if ( index < 0 ) {
+          listeners.push( callback );
+        }
+
+      },
 
       // addEventListener() is a convenience function to provide a more traditional way of hooking
       // into the observer pattern for listening to events on the network.
@@ -62,121 +113,68 @@ app.factory( 'LobbyProtocol', [
 
         switch ( eventType ) {
 
-        case lobbyProtocol.LOBBY_PUSH_GAME_CREATE:
-          lobbyProtocol.registerToGameCreate( callback );
+        case self.LOBBY_REQ_INIT:
+          self.registerListener( self.registryResInit, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_GAME_REMOVE:
-          lobbyProtocol.registerToGameRemove( callback );
+
+        case self.LOBBY_REQ_CREATE_GAME:
+          self.registerListener( self.registryResGameCreate, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_GAME_UPDATE:
-          lobbyProtocol.registerToGameUpdate( callback );
+
+        case self.LOBBY_REQ_JOIN_GAME:
+          self.registerListener( self.registryResGameJoin, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_CREATE:
-          lobbyProtocol.registerToPlayerCreate( callback );
+
+        case self.LOBBY_REQ_LEAVE_GAME:
+          self.registerListener( self.registryResGameLeave, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_REMOVE:
-          lobbyProtocol.registerToPlayerRemove( callback );
+
+        case self.LOBBY_REQ_SET_NAME:
+          self.registerListener( self.registryResSetName, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_UPDATE:
-          lobbyProtocol.registerToPlayerUpdate( callback );
+
+        case self.LOBBY_REQ_SET_READY:
+          self.registerListener( self.registryResSetReady, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_START_PLAYING:
-          lobbyProtocol.registerToStartPlaying( callback );
+
+        case self.LOBBY_REQ_SET_WAITING:
+          self.registerListener( self.registryResSetWaiting, callback );
           break;
+
+        case self.LOBBY_PUSH_GAME_CREATE:
+          self.registerListener( self.registryResGameCreate, callback );
+          break;
+
+        case self.LOBBY_PUSH_GAME_REMOVE:
+          self.registerListener( self.registryPushGameRemove, callback );
+          break;
+
+        case self.LOBBY_PUSH_GAME_UPDATE:
+          self.registerListener( self.registryPushGameUpdate, callback );
+          break;
+
+        case self.LOBBY_PUSH_PLAYER_CREATE:
+          self.registerListener( self.registryPushPlayerCreate, callback );
+          break;
+
+        case self.LOBBY_PUSH_PLAYER_REMOVE:
+          self.registerListener( self.registryPushPlayerRemove, callback );
+          break;
+
+        case self.LOBBY_PUSH_PLAYER_UPDATE:
+          self.registerListener( self.registryPushPlayerUpdate, callback );
+          break;
+
+        case self.LOBBY_PUSH_START_PLAYING:
+          self.registerListener( self.registryPushStartPlaying, callback );
+          break;
+
         default:
           throw 'LobbyProtocol.addEventListener >> Cannot register to this eventType. Unknown eventType!';
 
         }
 
       },
-
-      // registerToGameCreate() registers the given function callback to be called when a
-      // LOBBY_PUSH_GAME_CREATE network event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToGameCreate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushGameCreate.indexOf( callback );
-        if ( index < 0 ) {
-          lobbyProtocol.registryPushGameCreate.push( callback );
-        }
-
-      },
-
-      // registerToGameRemove() registers the given function callback to be called when a
-      // LOBBY_PUSH_GAME_REMOVE network event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToGameRemove: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushGameRemove.indexOf( callback );
-        if ( index < 0 ) {
-          lobbyProtocol.registryPushGameRemove.push( callback );
-        }
-
-      },
-
-      // registerToGameUpdate() registers the given function callback to be called when a
-      // LOBBY_PUSH_GAME_UPDATE network event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToGameUpdate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushGameUpdate.indexOf( callback );
-        if ( index < 0 ) {
-          lobbyProtocol.registryPushGameUpdate.push( callback );
-        }
-
-      },
-
-      // registerToPlayerCreate() registers the given function callback to be called when a
-      // LOBBY_PUSH_PLAYER_CREATE network event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToPlayerCreate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushPlayerCreate.indexOf( callback );
-        if ( index < 0 ) {
-          lobbyProtocol.registryPushPlayerCreate.push( callback );
-        }
-
-      },
-
-      // registerToPlayerRemove() registers the given function callback to be called when a
-      // LOBBY_PUSH_PLAYER_REMOVE network event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToPlayerRemove: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushPlayerRemove.indexOf( callback );
-        if ( index < 0 ) {
-          lobbyProtocol.registryPushPlayerRemove.push( callback );
-        }
-
-      },
-
-      // registerToPlayerUpdate() registers the given function callback to be called when a 
-      // LOBBY_PUSH_PLAYER_UPDATE network event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToPlayerUpdate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushPlayerUpdate.indexOf( callback );
-        if ( index < 0 ) {
-          lobbyProtocol.registryPushPlayerUpdate.push( callback );
-        }
-
-      },
-
-      // registerToStartPlaying() registers the given function callback to be called when a 
-      // LOBBY_PUSH_START_PLAYING network event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToStartPlaying: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushStartPlaying.indexOf( callback );
-        if ( index < 0 ) {
-          lobbyProtocol.registryPushStartPlaying.push( callback );
-        }
-
-      },
-
-      //
-      // Callback Deregistration
-      //
 
       // removeEventListener() is a convenience function to provide a more traditional way of hooking
       // into the observer pattern for listening to events of the network.
@@ -185,107 +183,65 @@ app.factory( 'LobbyProtocol', [
 
         switch ( eventType ) {
 
-        case lobbyProtocol.LOBBY_PUSH_GAME_CREATE:
-          lobbyProtocol.deregisterFromGameCreate( callback );
+        case self.LOBBY_REQ_INIT:
+          self.deregisterListener( self.registryResInit, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_GAME_REMOVE:
-          lobbyProtocol.deregisterFromGameRemove( callback );
+
+        case self.LOBBY_REQ_CREATE_GAME:
+          self.deregisterListener( self.registryResGameCreate, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_GAME_UPDATE:
-          lobbyProtocol.deregisterFromGameUpdate( callback );
+
+        case self.LOBBY_REQ_JOIN_GAME:
+          self.deregisterListener( self.registryResGameJoin, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_CREATE:
-          lobbyProtocol.deregisterFromPlayerCreate( callback );
+
+        case self.LOBBY_REQ_LEAVE_GAME:
+          self.deregisterListener( self.registryResGameLeave, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_REMOVE:
-          lobbyProtocol.deregisterFromPlayerRemove( callback );
+
+        case self.LOBBY_REQ_SET_NAME:
+          self.deregisterListener( self.registryResSetName, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_UPDATE:
-          lobbyProtocol.deregisterFromPlayerUpdate( callback );
+
+        case self.LOBBY_REQ_SET_READY:
+          self.deregisterListener( self.registryResSetReady, callback );
           break;
-        case lobbyProtocol.LOBBY_PUSH_START_PLAYING:
-          lobbyProtocol.deregisterFromStartPlaying( callback );
+
+        case self.LOBBY_REQ_SET_WAITING:
+          self.deregisterListener( self.registryResSetWaiting, callback );
           break;
+
+        case self.LOBBY_PUSH_GAME_CREATE:
+          self.deregisterListener( self.registryPushGameCreate, callback );
+          break;
+
+        case self.LOBBY_PUSH_GAME_REMOVE:
+          self.deregisterListener( self.registryPushGameRemove, callback );
+          break;
+
+        case self.LOBBY_PUSH_GAME_UPDATE:
+          self.deregisterListener( self.registryPushGameUpdate, callback );
+          break;
+
+        case self.LOBBY_PUSH_PLAYER_CREATE:
+          self.deregisterListener( self.registryPushPlayerCreate, callback );
+          break;
+
+        case self.LOBBY_PUSH_PLAYER_REMOVE:
+          self.deregisterListener( self.registryPushPlayerRemove, callback );
+          break;
+
+        case self.LOBBY_PUSH_PLAYER_UPDATE:
+          self.deregisterListener( self.registryPushPlayerUpdate, callback );
+          break;
+
+        case self.LOBBY_PUSH_START_PLAYING:
+          self.deregisterListener( self.registryPushStartPlaying, callback );
+          break;
+
         default:
           throw 'LobbyProtocol.removeEventListener >> Cannot deregister from this eventType. Unknown eventType!';
 
-        }
-
-      },
-
-      // deregisterFromGameCreate() deregisters the given function callback from the 
-      // LOBBY_PUSH_GAME_CREATE network event.
-      deregisterFromGameCreate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushGameCreate.indexOf( callback );
-        if ( index > 0 ) {
-          lobbyProtocol.registryPushGameCreate.push( callback );
-        }
-
-      },
-
-      // deregisterFromGameRemove() deregisters the given function callback from the
-      // LOBBY_PUSH_GAME_REMOVE network event.
-      deregisterFromGameRemove: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushGameRemove.indexOf( callback );
-        if ( index > 0 ) {
-          lobbyProtocol.registryPushGameRemove.push( callback );
-        }
-
-      },
-
-      // deregisterFromGameUpdate() deregisters the given function callback from the
-      // LOBBY_PUSH_GAME_UPDATE network event.
-      deregisterFromGameUpdate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushGameUpdate.indexOf( callback );
-        if ( index > 0 ) {
-          lobbyProtocol.registryPushGameUpdate.push( callback );
-        }
-
-      },
-
-      // deregisterFromPlayerCreate() deregisters the given function callback from the
-      // LOBBY_PUSH_PLAYER_CREATE network event.
-      deregisterFromPlayerCreate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushPlayerCreate.indexOf( callback );
-        if ( index > 0 ) {
-          lobbyProtocol.registryPushPlayerCreate.push( callback );
-        }
-
-      },
-
-      // deregisterFromPlayerRemove() deregisters the given function callback from the
-      // LOBBY_PUSH_PLAYER_REMOVE network event.
-      deregisterFromPlayerRemove: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushPlayerRemove.indexOf( callback );
-        if ( index > 0 ) {
-          lobbyProtocol.registryPushPlayerRemove.push( callback );
-        }
-
-      },
-
-      // deregisterFromPlayerUpdate() deregisters the given function callback from the
-      // LOBBY_PUSH_PLAYER_UPDATE network event.
-      deregisterFromPlayerUpdate: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushPlayerUpdate.indexOf( callback );
-        if ( index > 0 ) {
-          lobbyProtocol.registryPushPlayerUpdate.push( callback );
-        }
-
-      },
-
-      // deregisterFromStartPlaying() deregisters the given function callback from the
-      // LOBBY_PUSH_START_PLAYING network event.
-      deregisterFromStartPlaying: function ( callback ) {
-
-        var index = lobbyProtocol.registryPushStartPlaying.indexOf( callback );
-        if ( index > 0 ) {
-          lobbyProtocol.registryPushStartPlaying.splice( index, 1 );
         }
 
       },
@@ -296,17 +252,20 @@ app.factory( 'LobbyProtocol', [
 
       // emitRequest() is a convenience function to perform request emission as a one-liner for use 
       // in other, more specialized functions.
-      emitRequest: function ( cmd, data, name, callback ) {
+      emitRequest: function ( cmd, data ) {
 
         // Build the request object
         var request = {
           cmd: cmd,
           data: data,
-          name: name,
+          id: self.requestID
         };
 
+        // Store the request into the sentRequests map
+        self.sentRequests[ self.requestID++ ] = request;
+
         // Emit the request on the lobby channel
-        Socket.emit( 'lobby', request, callback );
+        Socket.emit( 'lobby', request );
 
       },
 
@@ -314,54 +273,54 @@ app.factory( 'LobbyProtocol', [
       // it with a new unique username (which can be changed later -- of course). This must be called
       // for the player to enter the lobby since we have to ensure a unique username is set for the
       // server to distinguish this user's requests from every other user's.
-      requestInit: function ( player, callback ) {
+      requestInit: function () {
 
-        lobbyProtocol.emitRequest( lobbyProtocol.LOBBY_REQ_INIT, null, '', callback );
+        self.emitRequest( self.LOBBY_REQ_INIT, null );
 
       },
 
       // requestGameCreate() notifies the server of the player's intent to create a new game.
-      requestGameCreate: function ( player, callback ) {
+      requestGameCreate: function () {
 
-        lobbyProtocol.emitRequest( lobbyProtocol.LOBBY_REQ_CREATE_GAME, null, player.name, callback );
+        self.emitRequest( self.LOBBY_REQ_CREATE_GAME, null );
 
       },
 
       // requestGameLeave() notifies the server of the player's intent to leave the game to which they
       // currently belong.
-      requestGameLeave: function ( player, callback ) {
+      requestGameLeave: function () {
 
-        lobbyProtocol.emitRequest( lobbyProtocol.LOBBY_REQ_LEAVE_GAME, null, player.name, callback );
+        self.emitRequest( self.LOBBY_REQ_LEAVE_GAME, null );
 
       },
 
       // requestGameJoin() notifies the server of the player's intent to join the game hosted by another
       // player, identified by the given hostName.
-      requestGameJoin: function ( player, hostName, callback ) {
+      requestGameJoin: function ( hostName ) {
 
-        lobbyProtocol.emitRequest( lobbyProtocol.LOBBY_REQ_JOIN_GAME, hostName, player.name, callback );
+        self.emitRequest( self.LOBBY_REQ_JOIN_GAME, hostName );
 
       },
 
       // requestSetName() notifies the server of the player's intent to change his/her name to the given 
       // newName.
-      requestSetName: function ( player, newName, callback ) {
+      requestSetName: function ( newName ) {
 
-        lobbyProtocol.emitRequest( lobbyProtocol.LOBBY_REQ_SET_NAME, newName, player.name, callback );
+        self.emitRequest( self.LOBBY_REQ_SET_NAME, newName );
 
       },
 
       // requestSetReady() notifies the server that the player is ready to begin playing.
-      requestSetReady: function ( player, callback ) {
+      requestSetReady: function () {
 
-        lobbyProtocol.emitRequest( lobbyProtocol.LOBBY_REQ_SET_READY, null, player.name, callback );
+        self.emitRequest( self.LOBBY_REQ_SET_READY, null );
 
       },
 
       // requestSetWaiting() notifies the server that the player is not ready to begin playing yet.
-      requestSetWaiting: function ( player, callback ) {
+      requestSetWaiting: function () {
 
-        lobbyProtocol.emitRequest( lobbyProtocol.LOBBY_REQ_SET_WAITING, null, player.name, callback );
+        self.emitRequest( self.LOBBY_REQ_SET_WAITING, null );
 
       },
 
@@ -369,129 +328,110 @@ app.factory( 'LobbyProtocol', [
       // Network Event Listeners
       //
 
-      // interpretPushCommand() determines the type of command being sent by the 
+      // interpretCommand() determines the type of command being sent by the 
       // server and calls the appropriate functions to notify listeners.
-      interpretPushCommand: function ( push ) {
+      interpretCommand: function ( data ) {
 
-        switch ( push.cmd ) {
+        switch ( data.cmd ) {
 
-        case lobbyProtocol.LOBBY_PUSH_GAME_CREATE:
-          lobbyProtocol.onPushGameCreate( push.data );
+        case self.LOBBY_PUSH_GAME_CREATE:
+          self.notifyListeners( self.registryPushGameCreate, data.data );
           break;
-        case lobbyProtocol.LOBBY_PUSH_GAME_REMOVE:
-          lobbyProtocol.onPushGameRemove( push.data );
+
+        case self.LOBBY_PUSH_GAME_REMOVE:
+          self.notifyListeners( self.registryPushGameRemove, data.data );
           break;
-        case lobbyProtocol.LOBBY_PUSH_GAME_UPDATE:
-          lobbyProtocol.onPushGameUpdate( push.data );
+
+        case self.LOBBY_PUSH_GAME_UPDATE:
+          self.notifyListeners( self.registryPushGameUpdate, data.data );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_CREATE:
-          lobbyProtocol.onPushPlayerCreate( push.data );
+
+        case self.LOBBY_PUSH_PLAYER_CREATE:
+          self.notifyListeners( self.registryPushPlayerCreate, data.data );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_REMOVE:
-          lobbyProtocol.onPushPlayerRemove( push.data );
+
+        case self.LOBBY_PUSH_PLAYER_REMOVE:
+          self.notifyListeners( self.registryPushPlayerRemove, data.data );
           break;
-        case lobbyProtocol.LOBBY_PUSH_PLAYER_UPDATE:
-          lobbyProtocol.onPushPlayerUpdate( push.data );
+
+        case self.LOBBY_PUSH_PLAYER_UPDATE:
+          self.notifyListeners( self.registryPushPlayerUpdate, data.data );
           break;
-        case lobbyProtocol.LOBBY_PUSH_START_PLAYING:
-          lobbyProtocol.onPushStartPlaying( push.data );
+
+        case self.LOBBY_PUSH_START_PLAYING:
+          self.notifyListeners( self.registryPushStartPlaying, data.data );
           break;
+
         default:
-          throw 'LobbyProtocol.interpretPushCommand >> Cannot handle push command. Unknown command!';
+          // No command was sent, so this must be a response for a previous request
+          self.onResponse( data );
 
         }
 
       },
 
-      // onPushGameCreate() is called in response to the LOBBY_PUSH_GAME_CREATE network event
-      // to notify all registered listeners to that event by calling all registered callbacks.
-      onPushGameCreate: function ( data ) {
+      // onResponse() is a convenience function to match up responses with the requests that
+      // they are related to, so that they can be dealt with appropriately.
+      onResponse: function ( res ) {
 
-        // Call each of the functions registered as listeners for this network event
-        var len = lobbyProtocol.registryPushGameCreate.length;
-        for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryPushGameCreate[ i ]( data );
-        }
+      // Look up the stored request matching the response's id
+      var associatedRequest = self.sentRequests[ res.id ];
+      
+      // If no request matched the response, throw an exception.
+      if ( 'undefined' == typeof( associatedRequest ) ) {
+        $log.error( 'CheckersProtocol.onResponse() >> Cannot match response to any request by ID!' );
+      }
 
-      },
+      // Attach the request to the response
+      res.request = associatedRequest;
 
-      // onPushGameRemove() is called in response to the LOBBY_PUSH_GAME_REMOVE network event
-      // to notify all registered listeners to that event by calling all registered callbacks.
-      onPushGameRemove: function ( data ) {
+      // Remove the request from the stored requests since it's no longer needed
+      var index = self.sentRequests.indexOf( associatedRequest );
+      self.sentRequests.splice( index, 1 );
 
-        // Call each of the functions registered as listeners for this network event
-        var len = lobbyProtocol.registryPushGameRemove.length;
-        for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryPushGameRemove[ i ]( data );
-        }
+      // If a request matched interpret the request's command but pass the response's data
+      switch ( associatedRequest.cmd ) {
 
-      },
+        case self.LOBBY_REQ_INIT:
+        self.notifyListeners( self.registryPushGameCreate, res.data );
+        break;
 
-      // onPushGameUpdate() is called in response to the LOBBY_PUSH_GAME_UPDATE network event
-      // to notify all registered listeners to that event by calling all registered callbacks.
-      onPushGameUpdate: function ( data ) {
+        case self.LOBBY_REQ_CREATE_GAME:
+          self.notifyListeners( self.registryResGameCreate, res.data );
+          break;
 
-        // Call each of the functions registered as listeners for this network event
-        var len = lobbyProtocol.registryPushGameUpdate.length;
-        for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryPushGameUpdate[ i ]( data );
-        }
+        case self.LOBBY_REQ_JOIN_GAME:
+          self.notifyListeners( self.registryResGameJoin, res.data );
+          break;
 
-      },
+        case self.LOBBY_REQ_LEAVE_GAME:
+          self.notifyListeners( self.registryResGameLeave, res.data );
+          break;
 
-      // onPushPlayerCreate() is called in response to the LOBBY_PUSH_PLAYER_CREATE network event
-      // to notify all registered listeners to that event by calling all registered callbacks.
-      onPushPlayerCreate: function ( data ) {
+        case self.LOBBY_REQ_SET_NAME:
+          self.notifyListeners( self.registryResSetName, res.data );
+          break;
 
-        // Call each of the functions registered as listeners for this network event
-        var len = lobbyProtocol.registryPushPlayerCreate.length;
-        for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryPushPlayerCreate[ i ]( data );
-        }
+        case self.LOBBY_REQ_SET_READY:
+          self.notifyListeners( self.registryResSetReady, res.data );
+          break;
 
-      },
+        case self.LOBBY_REQ_SET_WAITING:
+          self.notifyListeners( self.registryResSetWaiting, res.data );
+          break;
 
-      // onPushPlayerRemove() is called in response to the LOBBY_PUSH_PLAYER_REMOVE network event
-      // to notify all registered listeners to that event by calling all registered callbacks.
-      onPushPlayerRemove: function ( data ) {
-
-        // Call each of the functions registered as listeners for this network event
-        var len = lobbyProtocol.registryPushPlayerRemove.length;
-        for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryPushPlayerRemove[ i ]( data );
-        }
-
-      },
-
-      // onPushPlayerUpdate() is called in response to the LOBBY_PUSH_PLAYER_UPDATE network event
-      // to notify all registered listeners to that event by calling all registered callbacks.
-      onPushPlayerUpdate: function ( data ) {
-
-        // Call each of the functions registered as listeners for this network event
-        var len = lobbyProtocol.registryPushPlayerUpdate.length;
-        for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryPushPlayerUpdate[ i ]( data );
-        }
-
-      },
-
-      // onPushStartPlaying() is called in response to the LOBBY_PUSH_START_PLAYING network event
-      // to notify all registered listeners to that event by calling all registered callbacks.
-      onPushStartPlaying: function ( data ) {
-
-        // Call each of the functions registered as listeners for this network event
-        var len = lobbyProtocol.registryPushStartPlaying.length;
-        for ( var i = 0; i < len; i++ ) {
-          lobbyProtocol.registryPushStartPlaying[ i ]( data );
-        }
+        default:
+          $log.error( 'CheckersProtocol.onResponse() >> Request command unknown! OMFG IS THIS EVEN POSSIBLE?!' );
 
       }
+
+    },
 
     };
 
     // Init and retutrn
     init();
-    return lobbyProtocol;
+    return self;
 
   }
 

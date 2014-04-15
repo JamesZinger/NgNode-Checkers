@@ -47,10 +47,18 @@ app.controller( 'HomeController', [
 
     };
 
-    // Register callbacks for events on the lobby model
-    LobbyModel.registerToInitFailed( $scope.onLobbyInitFailed );
-    LobbyModel.registerToInitSuccess( $scope.onLobbyInitSuccess );
+    // Event listener for player set name failure
+    $scope.onPlayerSetNameFailed = function () {
 
+      // Display some kind of error
+      $log.error( 'HomeController.onPlayerSetNameFailed() >> Initial player set name request failed!' );
+
+    };
+
+    // Register callbacks for events on the lobby model
+    LobbyModel.addEventListener( LobbyModel.EVENT_INIT_FAILED, $scope.onLobbyInitFailed );
+    LobbyModel.addEventListener( LobbyModel.EVENT_INIT_SUCCESS, $scope.onLobbyInitSuccess );
+    LobbyModel.addEventListener( LobbyModel.EVENT_SET_NAME_FAILED, $scope.onPlayerSetNameFailed );
   }
 
 ] );
