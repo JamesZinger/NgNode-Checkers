@@ -534,12 +534,12 @@ function onDisconnect(socket)
 			var isGameDeleted = gameContext.leaveGame(client);
 			if (isGameDeleted === true)
 			{
-				pushGameClosed(game);
-				delete Games[game.gameName];
+				pushGameClosed(gameContext);
+				delete Games[gameContext.gameName];
 			}
 			else
 			{
-				pushGameUpdated(game);
+				pushGameUpdated(gameContext);
 			}
 			pushGameClosed(gameContext);
 			delete Games[gameContext.gameName];
