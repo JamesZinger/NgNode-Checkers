@@ -34,14 +34,14 @@ app.factory( 'PlayerModel', [
 
       // The state of the player in the lobby (LOBBY_STATE_AVAILABLE or 
       // LOBBY_STATE_PLAYING).
-      lobbyState: 'Available',
+      lobbyState: self.LOBBY_STATE_AVAILABLE,
 
       // A reference to a game in the lobby that the player currently belongs to
       gameLobby: null,
 
       // If the player is in a game, the index of this player in the game's player list.
       // Note: If the player is not in a game, this should be LOBBY_INDEX_NO_GAME.
-      gameLobbyIndex: -1,
+      gameLobbyIndex: self.LOBBY_INDEX_NO_GAME,
 
       // A reference to the game state of the game in progress
       game: null,

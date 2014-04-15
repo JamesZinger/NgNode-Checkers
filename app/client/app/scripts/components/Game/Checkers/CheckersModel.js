@@ -28,11 +28,11 @@ app.factory( 'CheckersModel', [
       // Seek through the board, adding pieces to the map by their IDs
       for ( var row = 0; row < 8; row++ ) {
         for ( var col = 0; col < 8; col++ ) {
-          var piece = board[ row ][ col ];
-          if ( piece === null ) {
+          var pieceRef = board[ row ][ col ];
+          if ( pieceRef === null ) {
             continue;
           } else {
-            this[ piece.id ] = piece;
+            this[ pieceRef.id ] = pieceRef;
           }
         }
       }
@@ -132,12 +132,13 @@ app.factory( 'CheckersModel', [
 
         $log.info( 'CheckersModel.init()' );
 
-        // Register event listeners for push notifications from the server
-        CheckersProtocol.registerToBeginTurn( self.onPushBeginTurn );
-        CheckersProtocol.registerToGameOver( self.onPushGameOver );
-        CheckersProtocol.registerToPieceDead( self.onPushPieceDead );
-        CheckersProtocol.registerToPieceKinged( self.onPushPieceKinged );
-        CheckersProtocol.registerToPiecePositioned( self.onPushPiecePositioned );
+        // Register event listeners for network events triggered by the server
+        CheckersProtocol.addEventListener( CheckersProtocol.CHECKERS_REQ_MOVE_PIECE, self.onResMovePiece );
+        CheckersProtocol.addEventListener( CheckersProtocol.CHECKERS_PUSH_BEGIN_TURN, self.onPushBeginTurn );
+        CheckersProtocol.addEventListener( CheckersProtocol.CHECKERS_PUSH_GAME_OVER, self.onPushGameOver );
+        CheckersProtocol.addEventListener( CheckersProtocol.CHECKERS_PUSH_PIECE_DEAD, self.onPushPieceDead );
+        CheckersProtocol.addEventListener( CheckersProtocol.CHECKERS_PUSH_PIECE_KINGED, self.onPushPieceKinged );
+        CheckersProtocol.addEventListener( CheckersProtocol.CHECKERS_PUSH_PIECE_POSITIONED, self.onPushPiecePositioned );
 
         // Read in the game state
         self.board = gameState.board;
@@ -228,30 +229,11 @@ app.factory( 'CheckersModel', [
 
       // requestMovePiece() notifies the server of the player's intent to move a
       // piece on the checkers board.
-      requestMovePiece: function ( player, piece, x, y ) {
+      requestMovePiece: function ( pieceID, x, y ) {
 
         $log.info( 'CheckersModel.requestMovePiece()' );
 
-        CheckersProtocol.requestMovePiece( self, piece, x, y, function ( data ) {
-
-          if ( !data || !data.approved ) {
-
-            // Do nothing?
-            var errorMessage = data.data;
-            $log.warn( 'CheckersModel.requestMovePiece() >> FAILED/DENIED! ' + errorMessage );
-
-          } else {
-
-            // Push the move onto the animationQueue to be handled by the render loop
-            self.animationQueue.push( {
-              piece: piece,
-              x: x,
-              y: y
-            } );
-
-          }
-
-        } );
+        CheckersProtocol.requestMovePiece( pieceID, x, y );
 
       },
 
@@ -259,9 +241,31 @@ app.factory( 'CheckersModel', [
       // Event Handlers
       //
 
+
+      onResMovePiece: function ( res ) {
+
+        if ( !res || !res.approved ) {
+
+          // Do nothing?
+          var errorMessage = res.data;
+          $log.warn( 'CheckersModel.requestMovePiece() >> FAILED/DENIED! ' + errorMessage );
+
+        } else {
+
+          // Push the move onto the animationQueue to be handled by the render loop
+          self.animationQueue.push( {
+            piece: res.request.piece,
+            x: res.request.x,
+            y: res.request.y
+          } );
+
+        }
+
+      },
+
       // onPushBeginTurn() is called when a push notification is recieved from the
       // server that a player's turn has begun, so the turn state should be set.
-      onPushBeginTurn: function () {
+      onPushBeginTurn: function ( push ) {
 
         $log.info( 'CheckersModel.onPushBeginTurn()' );
 
@@ -272,19 +276,19 @@ app.factory( 'CheckersModel', [
         // TODO
 
         // Set the player turn using the data package
-        var turn = data.data;
+        var turn = push.data;
         self.playerTurn = turn;
 
       },
 
       // onPushGameOver() is called when a push notification is recieved from the
       // server that the game is over and one of the two players has won.
-      onPushGameOver: function ( data ) {
+      onPushGameOver: function ( push ) {
 
         $log.info( 'CheckersModel.onPushGameOver()' );
 
         // Set the winner using the data package
-        var winner = data.data;
+        var winner = push.data;
         self.winner = winner;
 
         // Flag the game as over
@@ -294,36 +298,36 @@ app.factory( 'CheckersModel', [
 
       // onPushPieceDead() is called when a push notification is recieved from the
       // server that a piece was jumped and should be removed from play.
-      onPushPieceDead: function ( data ) {
+      onPushPieceDead: function ( push ) {
 
         $log.info( 'CheckersModel.onPushPieceDead()' );
 
         // Remove the piece from the board using the data package
-        var piece = data.data;
+        var piece = push.data;
         self.removePiece( piece );
 
       },
 
       // onPushPieceKinged() is called when a push notification is recieved from the
       // server that a piece reached the opposide end of the board and should be kinged.
-      onPushPieceKinged: function ( data ) {
+      onPushPieceKinged: function ( push ) {
 
         $log.info( 'CheckersModel.onPushPieceKinged()' );
 
         // King the piece using the data package
-        var piece = data.data;
+        var piece = push.data;
         self.kingPiece( piece );
 
       },
 
       // onPushPiecePositioned() is called when a push notification is recieved from 
       // the server that a piece on the board has been repositioned and should be moved.
-      onPushPiecePositioned: function ( data ) {
+      onPushPiecePositioned: function ( push ) {
 
         $log.info( 'CheckersModel.onPushPiecePositioned()' );
 
         // Push the move onto the animationQueue to be handled by the render loop
-        var moveData = data.data;
+        var moveData = push.data;
         self.animationQueue.push( {
           piece: moveData.piece,
           x: moveData.x,
@@ -456,8 +460,6 @@ app.factory( 'CheckersModel', [
 
     };
 
-    // Init and return
-    self.init();
     return self;
 
   }

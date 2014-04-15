@@ -5,6 +5,15 @@ app.factory( 'LobbyModel', [
   '$log', 'LobbyProtocol',
   function ( $log, LobbyProtocol ) {
 
+    // Retry calling requestInit() after a delay
+    function tryAgain() {
+
+      setTimeout( self.INIT_ATTEMPTS_DELAY, function () {
+        self.requestInit();
+      } );
+
+    }
+
     // Create the lobby model object
     var self = {
 
@@ -24,6 +33,9 @@ app.factory( 'LobbyModel', [
       //
       // Member Variables
       //
+
+      // The player on this client
+      player: null,
 
       // The lobby player list
       players: null,
@@ -47,14 +59,24 @@ app.factory( 'LobbyModel', [
 
         $log.info( 'LobbyModel.init()' );
 
+        // Store the player
+        self.player = player;
+
         // Register event listeners for push notifications from the server
-        LobbyProtocol.registerToGameCreate( self.onPushGameCreate );
-        LobbyProtocol.registerToGameRemove( self.onPushGameRemove );
-        LobbyProtocol.registerToGameUpdate( self.onPushGameUpdate );
-        LobbyProtocol.registerToPlayerCreate( self.onPushPlayerCreate );
-        LobbyProtocol.registerToPlayerRemove( self.onPushPlayerRemove );
-        LobbyProtocol.registerToPlayerUpdate( self.onPushPlayerUpdate );
-        LobbyProtocol.registerToStartPlaying( self.onPushStartPlaying );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_INIT, self.onResInit );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_CREATE_GAME, self.onResGameCreate );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_JOIN_GAME, self.onResGameJoin );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_LEAVE_GAME, self.onResGameLeave );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_SET_NAME, self.onResSetName );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_SET_READY, self.onResSetReady );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_REQ_SET_WAITING, self.onResSetWaiting );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_GAME_CREATE, self.onPushGameCreate );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_GAME_REMOVE, self.onPushGameRemove );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_GAME_UPDATE, self.onPushGameUpdate );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_PLAYER_CREATE, self.onPushPlayerCreate );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_PLAYER_REMOVE, self.onPushPlayerRemove );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_PLAYER_UPDATE, self.onPushPlayerUpdate );
+        LobbyProtocol.addEventListener( LobbyProtocol.LOBBY_PUSH_START_PLAYING, self.onPushStartPlaying );
 
         // Request to the server to deliver the inital lobby state.
         self.requestInit( player );
@@ -62,8 +84,45 @@ app.factory( 'LobbyModel', [
       },
 
       //
-      // Callback Regisitration
+      // Observer Pattern
       //
+
+      // deregisterListener() is a convenience function to deregister an event
+      // listener from an event, knowing the array of listeners from which the
+      // callback should be removed.
+      deregisterListener: function ( listeners, callback ) {
+
+        var index = listeners.indexOf( callback );
+        if ( index > 0 ) {
+          listeners.push( callback );
+        }
+
+      },
+
+      // notifyListeners() is a convenience function to perform notification of all
+      // registered listeners by calling each one and passing along the network
+      // event data. Listeners must be an array of callbacks.
+      notifyListeners: function ( listeners, data ) {
+
+        // Call each of the functions registered as listeners for this network event
+        var len = listeners.length;
+        for ( var i = 0; i < len; i++ ) {
+          listeners[ i ]( data );
+        }
+
+      },
+
+      // registerListener() is a convenience function to register an event
+      // listener to an event, knowing the array of listeners from which the
+      // callback should be removed.
+      registerListener: function ( listeners, callback ) {
+
+        var index = listeners.indexOf( callback );
+        if ( index < 0 ) {
+          listeners.push( callback );
+        }
+
+      },
 
       // addEventListener() is a convenience function to provide a more traditional way of 
       // hooking into the observer pattern for listening to events.
@@ -73,90 +132,31 @@ app.factory( 'LobbyModel', [
         switch ( eventType ) {
 
         case self.EVENT_INIT_FAILED:
-          self.registerToInitFailed( callback );
+          self.registerListener( self.registryInitFailed, callback );
           break;
+
         case self.EVENT_INIT_SUCCESS:
-          self.registerToInitSuccess( callback );
+          self.registerListener( self.registryInitSuccess, callback );
           break;
+
         case self.EVENT_SET_NAME_FAILED:
-          self.registerToSetNameFailed( callback );
+          self.registerListener( self.registrySetNameFailed, callback );
           break;
+
         case self.EVENT_SET_NAME_SUCCESS:
-          self.registerToSetNameSuccess( callback );
+          self.registerListener( self.registrySetNameSuccess, callback );
           break;
+
         case self.EVENT_START_PLAYING:
-          self.registerToStartPlaying( callback );
+          self.registerListener( self.registryStartPlaying, callback );
           break;
+
         default:
           throw 'LobbyModel.addEventListener >> Cannot register to this eventType. Unknown eventType!';
 
         }
 
       },
-
-      // registerToInitFailed() registers the given function callback to be called when a
-      // EVENT_INIT_FAILED event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToInitFailed: function ( callback ) {
-
-        var index = self.registryInitFailed.indexOf( callback );
-        if ( index < 0 ) {
-          self.registryInitFailed.push( callback );
-        }
-
-      },
-
-      // registerToInitSuccess() registers the given function callback to be called when a
-      // EVENT_INIT_SUCCESS event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToInitSuccess: function ( callback ) {
-
-        var index = self.registryInitSuccess.indexOf( callback );
-        if ( index < 0 ) {
-          self.registryInitSuccess.push( callback );
-        }
-
-      },
-
-      // registerToSetNameFailed() registers the given function callback to be called when a
-      // EVENT_SET_NAME_FAILED event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToSetNameFailed: function ( callback ) {
-
-        var index = self.registrySetNameFailed.indexOf( callback );
-        if ( index < 0 ) {
-          self.registrySetNameFailed.push( callback );
-        }
-
-      },
-
-      // registerToSetNameSuccess() registers the given function callback to be called when a
-      // EVENT_SET_NAME_SUCCESS event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToSetNameSuccess: function ( callback ) {
-
-        var index = self.registrySetNameSuccess.indexOf( callback );
-        if ( index < 0 ) {
-          self.registrySetNameSuccess.push( callback );
-        }
-
-      },
-
-      // registerToStartPlaying() registers the given function callback to be called when a
-      // EVENT_START_PLAYING event takes place.
-      // Note: The callback must be of the form: function ( data ) { ... }
-      registerToStartPlaying: function ( callback ) {
-
-        var index = self.registryStartPlaying.indexOf( callback );
-        if ( index < 0 ) {
-          self.registryStartPlaying.push( callback );
-        }
-
-      },
-
-      //
-      // Callback Deregistration
-      //
 
       // removeEventListener() is a convenience function to provide a more traditional 
       // way of hooking into the observer pattern for listening to events.
@@ -166,78 +166,28 @@ app.factory( 'LobbyModel', [
         switch ( eventType ) {
 
         case self.EVENT_INIT_FAILED:
-          self.deregisterFromInitFailed( callback );
+          self.deregisterListener( self.registryInitFailed, callback );
           break;
+
         case self.EVENT_INIT_SUCCESS:
-          self.deregisterFromInitSuccess( callback );
+          self.deregisterListener( self.registryInitSuccess, callback );
           break;
+
         case self.EVENT_SET_NAME_FAILED:
-          self.deregisterFromSetNameFailed( callback );
+          self.deregisterListener( self.registrySetNameFailed, callback );
           break;
+
         case self.EVENT_SET_NAME_SUCCESS:
-          self.deregisterFromSetNameSuccess( callback );
+          self.deregisterListener( self.registrySetNameSuccess, callback );
           break;
+
         case self.EVENT_START_PLAYING:
-          self.deregisterFromStartPlaying( callback );
+          self.deregisterListener( self.registryStartPlaying, callback );
           break;
+
         default:
           throw 'LobbyModel.removeEventListener >> Cannot deregister from this eventType. Unknown eventType!';
 
-        }
-
-      },
-
-      // deregisterFromInitFailed() deregisters the given function callback from the 
-      // EVENT_INIT_FAILED event.
-      deregisterFromInitFailed: function ( callback ) {
-
-        var index = self.registryInitFailed.indexOf( callback );
-        if ( index > 0 ) {
-          self.registryInitFailed.push( callback );
-        }
-
-      },
-
-      // deregisterFromInitSuccess() deregisters the given function callback from the 
-      // EVENT_INIT_SUCCESS event.
-      deregisterFromInitSuccess: function ( callback ) {
-
-        var index = self.registryInitSuccess.indexOf( callback );
-        if ( index > 0 ) {
-          self.registryInitSuccess.push( callback );
-        }
-
-      },
-
-      // deregisterFromSetNameFailed() deregisters the given function callback from the 
-      // EVENT_SET_NAME_FAILED event.
-      deregisterFromSetNameFailed: function ( callback ) {
-
-        var index = self.registrySetNameFailed.indexOf( callback );
-        if ( index > 0 ) {
-          self.registrySetNameFailed.push( callback );
-        }
-
-      },
-
-      // deregisterFromSetNameSuccess() deregisters the given function callback from the 
-      // EVENT_SET_NAME_SUCCESS event.
-      deregisterFromSetNameSuccess: function ( callback ) {
-
-        var index = self.registrySetNameSuccess.indexOf( callback );
-        if ( index > 0 ) {
-          self.registrySetNameSuccess.push( callback );
-        }
-
-      },
-
-      // deregisterFromStartPlaying() deregisters the given function callback from the 
-      // EVENT_START_PLAYING event.
-      deregisterFromStartPlaying: function ( callback ) {
-
-        var index = self.registryStartPlaying.indexOf( callback );
-        if ( index > 0 ) {
-          self.registryStartPlaying.push( callback );
         }
 
       },
@@ -248,165 +198,195 @@ app.factory( 'LobbyModel', [
 
       // requestInit() issues a request to fetch the necessary data to initialize
       // the lobby state and the player state on startup of the application.
-      requestInit: function ( player ) {
+      requestInit: function () {
 
         $log.info( 'LobbyModel.requestInit()' );
-
-        LobbyProtocol.requestInit( player, function ( data ) {
-
-          // Retry calling requestInit() after a delay
-          function tryAgain() {
-            setTimeout( self.INIT_ATTEMPTS_DELAY, function () {
-              self.requestInit();
-            } );
-          }
-
-          // Check for success to throw the appropriate events in response to the init response
-          if ( !data || !data.approved ) {
-
-            if ( self.initAttempts++ < self.INIT_ATTEMPTS_MAX ) {
-
-              // Init attempts remain -- Keep trying
-              tryAgain();
-
-            } else {
-
-              // Out of attempts -- Init has failed
-              self.onInitFailed();
-
-            }
-
-          } else {
-
-            // Init was successful
-            self.onInitSuccess( player, data );
-
-          }
-
-        } );
+        LobbyProtocol.requestInit();
 
       },
 
       // requestGameCreate() issues a request to create a new game with the given
       // player as the host.
-      requestGameCreate: function ( player ) {
+      requestGameCreate: function () {
 
         $log.info( 'LobbyModel.requestGameCreate()' );
-
-        LobbyProtocol.requestGameCreate( player, function ( data ) {
-
-          if ( !data || !data.approved ) {
-
-            // Do nothing?
-            $log.warn( 'LobbyModel.requestGameCreate() >> FAILED/DENIED!' );
-
-          } else {
-
-            // Create a new game using the data package
-            var createdGame = data.data;
-            self.games.push( createdGame );
-
-            // Update the player state having created the game
-            player.onCreatedOrJoinedGame( createdGame );
-
-          }
-
-        } );
+        LobbyProtocol.requestGameCreate();
 
       },
 
       // requestGameLeave() issues a request to cause the given player to leave
       // the game to which they currently belong. If the given player is the host
       // of that game, then the game must also be cancelled.
-      requestGameLeave: function ( player ) {
+      requestGameLeave: function () {
 
         $log.info( 'LobbyModel.requestGameLeave()' );
-
-        LobbyProtocol.requestGameLeave( player, function ( data ) {
-
-          if ( !data || !data.approved ) {
-
-            // Do nothing?
-            $log.warn( 'LobbyModel.requestGameLeave() >> FAILED/DENIED!' );
-
-          } else {
-
-            // If this player is the host, cancel the game
-            if ( player.name === player.getGameHost() ) {
-              var index = self.indexOfGameByHostPlayerName( player.name );
-              self.games.splice( index, 1 );
-            }
-
-            // Update the player state having left the game
-            player.onLeftGame();
-
-          }
-
-        } );
+        LobbyProtocol.requestGameLeave();
 
       },
 
       // requestGameJoin() issues a request to join the game hosted by the player
       // with the given hostName.
-      requestGameJoin: function ( player, hostName ) {
+      requestGameJoin: function ( hostName ) {
 
         $log.info( 'LobbyModel.requestGameJoin()' );
-
-        LobbyProtocol.requestGameJoin( player, hostName, function ( data ) {
-
-          if ( !data || !data.approved ) {
-
-            // Do nothing?
-            $log.warn( 'LobbyModel.requestGameJoin() >> FAILED/DENIED!' );
-
-          } else {
-
-            // Update the game using the data package
-            var updatedGame = data.data;
-            var index = self.indexOfGameByHostPlayerName( hostName );
-            self.games[ index ].players = updatedGame.players;
-
-            // Update the player state having joined the game
-            player.onCreatedOrJoinedGame( self.games[ index ] );
-
-          }
-
-        } );
+        LobbyProtocol.requestGameJoin( hostName );
 
       },
 
       // requestSetName() issues a request to set the given player's name to newName.
-      requestSetName: function ( player, newName ) {
+      requestSetName: function ( newName ) {
 
         $log.info( 'LobbyModel.requestSetName()' );
-
-        LobbyProtocol.requestSetName( player, newName, function ( data ) {
-
-          if ( !data || !data.approved ) {
-
-            // Name change failed/denied
-            self.onSetNameFailed();
-
-          } else {
-
-            // Name change approved
-            var newName = data.data;
-            self.onSetNameSuccess( player, newName );
-
-          }
-
-        } );
+        LobbyProtocol.requestSetName( newName );
 
       },
 
       // requestSetReady() issues a request to set the given player's status to AVAILABLE.
-      requestSetReady: function ( player ) {
+      requestSetReady: function () {
 
         $log.info( 'LobbyModel.requestSetReady()' );
+        LobbyProtocol.requestSetReady();
 
-        LobbyProtocol.requestSetReady( player, function ( data ) {
+      },
 
-          if ( !data || !data.approved ) {
+      // requestSetWaiting() issues a request to set the given player's state to WAITING.
+      requestSetWaiting: function () {
+
+        $log.info( 'LobbyModel.requestSetWaiting()' );
+        LobbyProtocol.requestSetWaiting();
+
+      },
+
+      //
+      // Event Listeners
+      //
+
+      // onResInit()
+      onResInit: function ( res ) {
+
+        $log.info( 'LobbyModel.onResInit()' );
+
+        // Check for success to throw the appropriate events in response to the init response
+        if ( !res || !res.approved ) {
+
+          if ( self.initAttempts++ < self.INIT_ATTEMPTS_MAX ) {
+
+            // Init attempts remain -- Keep trying
+            tryAgain();
+
+          } else {
+
+            // Out of attempts -- Init has failed
+            self.onInitFailed();
+
+          }
+
+        } else {
+
+          // Init was successful
+          self.onInitSuccess( res );
+
+        }
+
+      },
+
+      // onResGameCreate()
+      onResGameCreate: function ( res ) {
+
+        $log.info( 'LobbyModel.onResGameCreate()' );
+
+        if ( !res || !res.approved ) {
+
+          // Do nothing?
+          $log.warn( 'LobbyModel.requestGameCreate() >> FAILED/DENIED!' );
+
+        } else {
+
+          // Create a new game using the data package
+          var createdGame = res.data;
+          self.games.push( createdGame );
+
+          // Update the player state having created the game
+          self.player.onCreatedOrJoinedGame( createdGame );
+
+        }
+
+      },
+
+      // onResGameJoin()
+      onResGameJoin: function ( res ) {
+
+        $log.info( 'LobbyModel.onResGameJoin()' );
+
+        if ( !res || !res.approved ) {
+
+          // Do nothing?
+          $log.warn( 'LobbyModel.requestGameJoin() >> FAILED/DENIED!' );
+
+        } else {
+
+          // Update the game using the data package
+          var updatedGame = res.data;
+          var index = self.indexOfGameByHostPlayerName( res.request.data );
+          self.games[ index ].players = updatedGame.players;
+
+          // Update the player state having joined the game
+          self.player.onCreatedOrJoinedGame( self.games[ index ] );
+
+        }
+
+      },
+
+      // onResGameLeave()
+      onResGameLeave: function ( res ) {
+
+        $log.info( 'LobbyModel.onResGameLeave()' );
+
+        if ( !res || !res.approved ) {
+
+          // Do nothing?
+          $log.warn( 'LobbyModel.requestGameLeave() >> FAILED/DENIED!' );
+
+        } else {
+
+          // If this player is the host, cancel the game
+          if ( self.player.name === self.player.getGameHost() ) {
+            var index = self.indexOfGameByHostPlayerName( self.player.name );
+            self.games.splice( index, 1 );
+          }
+
+          // Update the player state having left the game
+          self.player.onLeftGame();
+
+        }
+
+      },
+
+      // onResSetName()
+      onResSetName: function ( res ) {
+
+        $log.info( 'LobbyModel.onResSetName()' );
+
+        if ( !res || !res.approved ) {
+
+          // Name change failed/denied
+          self.onSetNameFailed();
+
+        } else {
+
+          // Name change approved
+          self.onSetNameSuccess( res );
+
+        }
+
+      },
+
+      // onResSetReady()
+      onResSetReady: function ( res ) {
+
+        $log.info( 'LobbyModel.onResSetReady()' );
+
+        if ( !res || !res.approved ) {
 
             // Do nothing?
             $log.warn( 'LobbyModel.requestSetReady() >> FAILED/DENIED!' );
@@ -414,40 +394,30 @@ app.factory( 'LobbyModel', [
           } else {
 
             // Set the player's readiness in the game to which they belong
-            player.onSetReady();
+            self.player.onSetReady();
 
           }
 
-        } );
-
       },
 
-      // requestSetWaiting() issues a request to set the given player's state to WAITING.
-      requestSetWaiting: function ( player ) {
+      // onResSetWaiting()
+      onResSetWaiting: function ( res ) {
 
-        $log.info( 'LobbyModel.requestSetWaiting()' );
+        $log.info( 'LobbyModel.onResSetWaiting()' );
 
-        LobbyProtocol.requestSetWaiting( player, function ( data ) {
+        if ( !res || !res.approved ) {
 
-          if ( !data || !data.approved ) {
+          // Do nothing?
+          $log.warn( 'LobbyModel.requestSetWaiting() >> FAILED/DENIED!' );
 
-            // Do nothing?
-            $log.warn( 'LobbyModel.requestSetWaiting() >> FAILED/DENIED!' );
+        } else {
 
-          } else {
+          // Set the player's readiness in the game to which they belong
+          self.player.onSetWaiting();
 
-            // Set the player's readiness in the game to which they belong
-            player.onSetWaiting();
-
-          }
-
-        } );
+        }
 
       },
-
-      //
-      // Event Handlers
-      //
 
       // onInitFailed() is called when requestInit() is repeatedly unsuccessful and 
       // the attempt counter maxes out, so requestInit() gives up trying to connect.
@@ -456,29 +426,23 @@ app.factory( 'LobbyModel', [
         $log.error( 'LobbyModel.onInitFailed()' );
 
         // Call each of the functions registered as listeners for this event
-        var len = self.registryInitFailed.length;
-        for ( var i = 0; i < len; i++ ) {
-          self.registryInitFailed[ i ]();
-        }
+        self.notifyListeners( self.registryInitFailed, null );
 
       },
 
       // onInitSuccess() is called when requestInit() recieves back an initialization
       // data packet from the server to configure the
-      onInitSuccess: function ( player, data ) {
+      onInitSuccess: function ( res ) {
 
         $log.info( 'LobbyModel.onInitSuccess()' );
 
         // Use the players and games arrays sent from the server
-        var initialLobbyState = data.data;
+        var initialLobbyState = res.data;
         self.players = initialLobbyState.players;
         self.games = initialLobbyState.games;
 
         // Call each of the functions registered as listeners for this event
-        var len = self.registryInitSuccess.length;
-        for ( var i = 0; i < len; i++ ) {
-          self.registryInitSuccess[ i ]();
-        }
+        self.notifyListeners( self.registryInitSuccess, null );
 
       },
 
@@ -490,27 +454,22 @@ app.factory( 'LobbyModel', [
         $log.info( 'LobbyModel.onSetNameFailed()' );
 
         // Call each of the functions registered as listeners for this event
-        var len = self.registrySetNameFailed.length;
-        for ( var i = 0; i < len; i++ ) {
-          self.registrySetNameFailed[ i ]();
-        }
+        self.notifyListeners( self.registrySetNameFailed, null );
 
       },
 
       // onSetNameSuccess() is called when requestSetName() is successful. This should
       // result in a screen change from the homepage to the lobby.
-      onSetNameSuccess: function ( player, newName ) {
+      onSetNameSuccess: function ( res ) {
 
         $log.info( 'LobbyModel.onSetNameSuccess()' );
 
         // Change the player's name
-        player.onSetName( newName );
+        var newName = res.data;
+        self.player.onSetName( newName );
 
         // Call each of the functions registered as listeners for this event
-        var len = self.registrySetNameSuccess.length;
-        for ( var i = 0; i < len; i++ ) {
-          self.registrySetNameSuccess[ i ]();
-        }
+        self.notifyListeners( self.registrySetNameSuccess, null );
 
       },
 
@@ -693,8 +652,6 @@ app.factory( 'LobbyModel', [
 
     };
 
-    // Init and retutrn
-    self.init();
     return self;
 
   }
