@@ -339,7 +339,11 @@ function Piece(teamNumber, tile, id)
 
 	this.kill = function(checkers)
 	{
-		checkers.board[self.teamNumber].splice(self.id, 1);
+
+		checkers.board.tiles[self.x][self.y].movePieceOff();
+		self.x = -1;
+		self.y = -1;
+
 		checkers.pushPieceKilled(self);
 	};
 
@@ -351,6 +355,15 @@ function Piece(teamNumber, tile, id)
 
 	this.move = function(x, y, checkers, data)
 	{
+		if (x < 0 || x > 7 || y < 0 || y > 7)
+		{
+			return {
+				approved: false,
+				data: "Invaild tile corrdinates",
+				id: data.id
+			};
+		}
+
 		var tile = checkers.board.tiles[x][y];
 
 		//Check if the tile is moveable
@@ -361,12 +374,31 @@ function Piece(teamNumber, tile, id)
 				id: data.id
 			};
 
+		var moveDist	= {};
+		moveDist.x		= Math.abs(x - self.x);
+		moveDist.y		= Math.abs(y - self.y);
+		
+		var moveDir		= {};
+		moveDr.x		= Math.sign(x - self.x);
+		moveDir.y		= Math.sign(y - self.y);
+
+		if (moveDist.x > 2 || moveDist.y > 2)
+		{
+			return {
+				approved: false,
+				data: "Cannot move farther that 2 paces in one move",
+				id: data.id
+			};
+		}
+
+
 		// if the piece is a king this check is different
 		if (self.isKing === false)
 		{
+			var dispY = y - self.y;
 			//Check the direction of movement and amount of movement
 			if (teamNumber === 0)
-				if ((y - self.y) !== -1)
+				if (dispY > 0)
 					return {
 						approved: false,
 						data: "Cannot move to that location",
@@ -375,7 +407,7 @@ function Piece(teamNumber, tile, id)
 				
 
 			else if (teamNumber === 1)
-				if ((y - self.y !== 1))
+				if ((dispY < 0))
 					return {
 							approved: false,
 							data: "Cannot move to that location",
@@ -383,34 +415,69 @@ function Piece(teamNumber, tile, id)
 					};
 		}
 
-		// If the piece is a king
-		else
-		{
-			var deltaX = Math.abs(x - self.x);
-			var deltaY = Math.abs(y - self.y);
-
-			if (deltaX !== 1 || deltaY !== 1)
-				return {
-					approved: false,
-					data: "cannot move to that location",
-					id: data.id
-				};
-		}
-
-		//Check if the tile is occupied
 		if (tile.hasPiece === true)
 		{
-			if (tile.pieceTeam === self.teamNumber)
-				return {
-					approved: false,
-					data: "Cannot move over a friendly piece",
-					id: data.id
-				};
-
-
+			return {
+				approved:false,
+				data: "Cannot move onto another piece",
+				id: data.id
+			};
 		}
 
-		// Vaild Move and No Piece is there
+		//tried to jump a piece
+		if (moveDist.x === 2 || moveDist.y === 2)
+		{
+			var tileCorrd = {};
+			tileCorrd.x = x + moveDir.x;
+			tileCorrd.y = y + moveDir.y;
+
+			var midTile = checkers.board.tiles[tileCorrd.x][tileCorrd.y];
+			if (midTile.hasPiece === false)
+			{
+				return {
+					approved: false,
+					data: "Cannot move over a blank tile",
+					id: data.id
+				};
+			}
+
+			if (midTile.pieceTeam === self.teamNumber)
+			{
+				return{
+					approved: false,
+					data:"Cannot move over a friendly piece",
+					id: data.id
+				};
+			}
+
+			//check if the piece and move again
+			tile.movePieceOn(self);
+			checkers.pushPieceMoved(piece);
+
+			if (self.checkIfShouldKing() === true)
+			{
+				self.king();
+			}
+
+			///find the piece killed
+			checkers.board.pieces[midTile.pieceTeam][midTile.pieceId].kill(checkers);
+
+			//check if more can be killed
+			if (self.isKing === true)
+			{
+
+			}
+			else if (self.teamNumber === 0)
+			{
+
+			}
+			else if (self.teamNumber === 1)
+			{
+
+			}
+
+		}
+		// only moving one and the tile is clear and vaild
 		else
 		{
 			tile.movePieceOn(self);
@@ -448,6 +515,62 @@ function Piece(teamNumber, tile, id)
 		{
 			if (self.y === 7)
 				return true;
+		}
+
+		return false;
+	};
+
+	this.samplePossibleMoves = function(checkers)
+	{
+		var startNum = 0;
+		var finalNum = 0;
+		if (self.isKing === true)
+		{
+			startNum = -1;
+			finalNum = 1;
+		}
+		else if (self.teamNumber === 0)
+		{
+			startNum = -1;
+			finalNum = 0;
+		}
+		else if (self.teamNumber === 1)
+		{
+			startNum = 1;
+			finalNum = 2;
+		}
+
+		for (var i = -1; i < 2; i+=2)
+		{
+			for (var j = startNum; j <= finalNum; j+=2)
+			{
+				var testCorrd = {};
+				testCorrd.x = self.x + i;
+				testCorrd.y = self.y + j;
+
+				if (testCorrd.x < 0 || testCorrd.x > 7 || testCorrd.y < 0 || testCorrd.y > 7)
+					continue;
+
+				var tile = checkers.board.tiles[testCorrd.x][testCorrd.y];
+
+				if( tile.hasPiece === true && tile.pieceTeam !== self.teamNumber)
+				{
+					//check the tile far away
+					testCorrd2 = {};
+					testCorrd2.x = self.x + (i * 2);
+					testCorrd2.y = self.y + (j * 2);
+
+					if (testCorrd2.x < 0 || testCorrd2.x > 7 || testCorrd2.y < 0 || testCorrd2.y > 7)
+						continue;
+
+					var tile2 = checkers.board.tiles[testCorrd2.x][testCorrd2.y];
+
+					if (tile2.hasPiece === false)
+					{
+						return true;
+					}
+				}
+			}
 		}
 
 		return false;
