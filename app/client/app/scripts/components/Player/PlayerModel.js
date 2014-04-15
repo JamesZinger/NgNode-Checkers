@@ -32,15 +32,14 @@ app.factory( 'PlayerModel', [
       // The lobby that the player is participating in.
       lobby: null,
 
-      // The state of the player in the lobby (LOBBY_STATE_AVAILABLE or 
-      // LOBBY_STATE_PLAYING).
-      lobbyState: 'Available',
+      // A references to the player that corresponds to this in the lobby player list.
+      playerLobby: null,
 
       // A reference to a game in the lobby that the player currently belongs to.
       gameLobby: null,
 
       // A reference to the player object contained by the lobby game.
-      playerLobby: null,
+      gamePlayerLobby: null,
 
       // If the player is in a game, the index of this player in the game's player list.
       // Note: If the player is not in a game, this should be LOBBY_INDEX_NO_GAME.
@@ -150,8 +149,8 @@ app.factory( 'PlayerModel', [
         // list and switch the player's state to LOBBY_STATE_PLAYING.
         self.gameLobby = game;
         self.gameLobbyIndex = game.players.length - 1;
-        self.playerLobby = self.gameLobby.players[ self.gameLobbyIndex ];
-        self.lobbyState = self.LOBBY_STATE_PLAYING;
+        self.gamePlayerLobby = self.gameLobby.players[ self.gameLobbyIndex ];
+        self.playerLobby.state = self.LOBBY_STATE_PLAYING;
 
       },
 
@@ -163,10 +162,10 @@ app.factory( 'PlayerModel', [
 
         // Clear the game reference, reset the player index to LOBBY_INDEX_NO_GAME
         // list and switch the player's state to LOBBY_STATE_AVAILABLE.
-        self.gameLobby = null;
+        self.playerLobby.state = self.LOBBY_STATE_AVAILABLE;
+        self.gamePlayerLobby = null;
         self.gameLobbyIndex = self.LOBBY_INDEX_NO_GAME;
-        self.playerLobby = null;
-        self.state = self.LOBBY_STATE_AVAILABLE;
+        self.gameLobby = null;
 
       },
 
@@ -179,9 +178,21 @@ app.factory( 'PlayerModel', [
         // Set the player's name
         self.name = newName;
 
+        // Find the player in the list and change their name there
+        if ( self.lobby.players !== null ) {
+          var len = self.lobby.players.length;
+          for ( var index = 0; index < len; index++ ) {
+            if ( self.name === self.lobby.players[ index ].name ) {
+              break;
+            }
+          }
+          var lobbyPlayer = self.lobby.players[ index ];
+          lobbyPlayer.name = newName;
+        }
+
         // If the player is in a game, change the player's name there too
-        if ( self.playerLobby !== null ) {
-          self.playerLobby.name = newName;
+        if ( self.gamePlayerLobby !== null ) {
+          self.gamePlayerLobby.name = newName;
         }
 
       },
@@ -194,7 +205,7 @@ app.factory( 'PlayerModel', [
         $log.info( 'PlayerModel.onSetReady()' );
 
         // Set readiness in the game to LOBBY_READINESS_READY
-        self.playerLobby.ready = self.LOBBY_READINESS_READY;
+        self.gamePlayerLobby.ready = self.LOBBY_READINESS_READY;
 
       },
 
@@ -206,7 +217,7 @@ app.factory( 'PlayerModel', [
         $log.info( 'PlayerModel.onSetWaiting()' );
 
         // Set readiness in the game to LOBBY_READINESS_WAITING
-        self.playerLobby.ready = self.LOBBY_READINESS_WAITING;
+        self.gamePlayerLobby.ready = self.LOBBY_READINESS_WAITING;
 
       },
 

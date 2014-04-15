@@ -6,8 +6,8 @@
         <a class="action-button btn btn-lg btn-info" ng-click="onCreateGameAction( $event )" ng-show="player.gameLobby === null">Create Game</a>
         <a class="action-button btn btn-lg btn-default" ng-click="onCancelGameAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ 0 ] === player.playerLobby">Cancel Game</a>
         <a class="action-button btn btn-lg btn-default" ng-click="onLeaveGameAction( $event )" ng-show="player.gameLobby !== null && player.gameLobby.players[ 0 ] !== player.playerLobby">Leave Game</a>
-        <a class="action-button btn btn-lg btn-success" ng-click="onReadyAction( $event )" ng-show="player.gameLobby !== null && !player.playerLobby.ready">Ready To Play!</a>
-        <a class="action-button btn btn-lg btn-danger" ng-click="onWaitingAction( $event )" ng-show="player.gameLobby !== null && player.playerLobby.ready">Wait Up!</a>
+        <a class="action-button btn btn-lg btn-success" ng-click="onReadyAction( $event )" ng-show="player.gameLobby !== null && !player.gamePlayerLobby.ready">Ready To Play!</a>
+        <a class="action-button btn btn-lg btn-danger" ng-click="onWaitingAction( $event )" ng-show="player.gameLobby !== null && player.gamePlayerLobby.ready">Wait Up!</a>
         <hr />
         <h3>Players</h3>
         <input type="text" class="form-control" placeholder="Filter for a player" ng-model="filterPlayersName">
@@ -20,13 +20,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="lobby-player" ng-repeat="otherPlayer in player.lobby.players | filter: { name: filterPlayersName }">
+            <tr class="lobby-player" ng-repeat="player in player.lobby.players | filter: { name: filterPlayersName }">
               <td class="player-name">
-                {{ otherPlayer.name }}
+                {{ player.name }}
               </td>
               <td class="player-state">
-                <span class="label label-success" ng-show="otherPlayer.state == 'Available'">Available</span>
-                <span class="label label-danger" ng-show="otherPlayer.state == 'Playing'">Playing</span>
+                <span class="label label-success" ng-show="player.state === 'Available'">Available</span>
+                <span class="label label-danger" ng-show="player.state === 'Playing'">Playing</span>
               </td>
             </tr>
           </tbody>

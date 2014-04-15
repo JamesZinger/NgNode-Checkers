@@ -243,7 +243,7 @@ function joinGame(clientContext, data, reqId)
 	if (gameContext.joinGame(clientContext) === true)
 	{
 		clientContext.isInGame = true;
-		clientContext.gameId = gameId;
+		clientContext.gameId = gameContext.gameId;
 
 		pushGameUpdated(gameContext);
 
