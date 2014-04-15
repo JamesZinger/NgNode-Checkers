@@ -180,12 +180,14 @@ function leaveGame(clientContext, reqId)
 	
 	var gameContext;
 
-	//Leave the game
-	for (var i = 0; i < Games.length; i++)
+	for (var key in Games)
 	{
-		if (Games[i].id === clientContext.gameId)
+		if (Games.hasOwnProperty(key))
 		{
-			gameContext = Games[i];
+			if (Games[key].id === clientContext.gameId)
+			{
+				gameContext = Games[key];
+			}
 		}
 	}
 
@@ -239,12 +241,14 @@ function joinGame(clientContext, data, reqId)
 
 	var gameContext;
 
-	//Leave the game
-	for (var i = 0; i < Games.length; i++)
+	for (var key in Games)
 	{
-		if (Games[i].id === gameId)
+		if (Games.hasOwnProperty(key))
 		{
-			gameContext = Games[i];
+			if (Games[key].id === clientContext.gameId)
+			{
+				gameContext = Games[key];
+			}
 		}
 	}
 
@@ -299,14 +303,16 @@ function setReady(clientContext, reqId)
 
 	clientContext.isReady = true;
 
-	var gameContext;
+	var gameContext = {};
 
-	//Leave the game
-	for (var i = 0; i < Games.length; i++)
+	for (var key in Games)
 	{
-		if (Games[i].id === clientContext.gameId)
+		if (Games.hasOwnProperty(key))
 		{
-			gameContext = Games[i];
+			if (Games[key].id === clientContext.gameId)
+			{
+				gameContext = Games[key];
+			}
 		}
 	}
 
@@ -352,12 +358,14 @@ function setWait(clientContext, reqId)
 
 	var gameContext;
 
-	//Leave the game
-	for (var i = 0; i < Games.length; i++)
+	for (var key in Games)
 	{
-		if (Games[i].id === clientContext.gameId)
+		if (Games.hasOwnProperty(key))
 		{
-			gameContext = Games[i];
+			if (Games[key].id === clientContext.gameId)
+			{
+				gameContext = Games[key];
+			}
 		}
 	}
 
@@ -523,14 +531,15 @@ function onDisconnect(socket)
 	{
 		var gameContext;
 
-		//Leave the game
-		for (var i = 0; i < Games.length; i++)
+		for (var key in Games)
 		{
-			if (Games[i].id === gameId)
+			if (Games.hasOwnProperty(key))
 			{
-				gameContext = Games[i];
+				if (Games[key].id === clientContext.gameId)
+				{
+					gameContext = Games[key];
+				}
 			}
-		
 		}
 
 		gameContext.leaveGame(client);

@@ -68,7 +68,6 @@ function Game(client)
 			self.players[i].isPlaying = false;
 		}
 	};
-
 }
 
 exports.CreateGame = function(client)
