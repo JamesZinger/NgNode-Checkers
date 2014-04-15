@@ -353,7 +353,7 @@ app.factory( 'LobbyModel', [
         } else {
 
           // If this player is the host, cancel the game
-          if ( self.player.name === self.player.getGameHost() ) {
+          if ( self.player.name === self.player.getGameHostName() ) {
             var index = self.indexOfGameByHostPlayerName( self.player.name );
             self.games.splice( index, 1 );
           }

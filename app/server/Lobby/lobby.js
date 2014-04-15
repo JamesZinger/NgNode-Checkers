@@ -194,12 +194,12 @@ function leaveGame(clientContext, reqId)
 	var isGameDeleted = gameContext.leaveGame(clientContext);
 	if (isGameDeleted === true)
 	{
-		pushGameClosed(game);
-		delete Games[game.gameName];
+		pushGameClosed(gameContext);
+		delete Games[gameContext.gameName];
 	}
 	else
 	{
-		pushGameUpdated(game);
+		pushGameUpdated(gameContext);
 	}
 	
 
@@ -545,12 +545,12 @@ function onDisconnect(socket)
 		var isGameDeleted = gameContext.leaveGame(client);
 		if (isGameDeleted === true)
 		{
-			pushGameClosed(game);
-			delete Games[game.gameName];
+			pushGameClosed(gameContext);
+			delete Games[gameContext.gameName];
 		}
 		else
 		{
-			pushGameUpdated(game);
+			pushGameUpdated(gameContext);
 		}
 	
 	}

@@ -17,8 +17,8 @@ app.factory( 'PlayerModel', [
       LOBBY_STATE_AVAILABLE: 'Available',
       LOBBY_STATE_PLAYING: 'Playing',
 
-      LOBBY_READINESS_READY: 'Ready',
-      LOBBY_READINESS_WAITING: 'Waiting',
+      LOBBY_READINESS_READY: true,
+      LOBBY_READINESS_WAITING: false,
 
       LOBBY_INDEX_NO_GAME: -1,
 
@@ -150,7 +150,7 @@ app.factory( 'PlayerModel', [
         // list and switch the player's state to LOBBY_STATE_PLAYING.
         self.gameLobby = game;
         self.gameLobbyIndex = game.players.length - 1;
-        self.playerLobby = self.gameLobbyIndex;
+        self.playerLobby = self.gameLobby.players[ self.gameLobbyIndex ];
         self.lobbyState = self.LOBBY_STATE_PLAYING;
 
       },
