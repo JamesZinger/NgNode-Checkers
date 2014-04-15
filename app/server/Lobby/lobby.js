@@ -639,6 +639,8 @@ function pushGameUpdated(gameContext)
 		cmd: 'GU',
 		data: game
 	};
+
+	sendPushRequestToAllBut(req, gameContext.players[0]);
 }
 
 function sendPushRequestToAllBut(req, clientContext)
