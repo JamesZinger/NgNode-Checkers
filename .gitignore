@@ -36,3 +36,6 @@ node_modules
 # Subelime Project Files
 *.sublime-project
 *.sublime-workspace
+
+# Specific ignore for backend dev
+app/server/index.html
