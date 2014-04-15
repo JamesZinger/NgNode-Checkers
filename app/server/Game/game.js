@@ -11,6 +11,8 @@ function Game(client)
 	this.gameRef  = null;
 
 	this.players.push(client);
+	client.isInGame = true;
+	client.gameId = this.id;
 
 	game_id_counter++;
 

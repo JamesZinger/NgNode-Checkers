@@ -301,7 +301,7 @@ app.factory( 'LobbyModel', [
         if ( !res || !res.approved ) {
 
           // Do nothing?
-          $log.warn( 'LobbyModel.requestGameCreate() >> FAILED/DENIED!' );
+          $log.warn( 'LobbyModel.onResGameCreate() >> FAILED/DENIED!' );
 
         } else {
 
@@ -324,7 +324,7 @@ app.factory( 'LobbyModel', [
         if ( !res || !res.approved ) {
 
           // Do nothing?
-          $log.warn( 'LobbyModel.requestGameJoin() >> FAILED/DENIED!' );
+          $log.warn( 'LobbyModel.onResGameJoin() >> FAILED/DENIED!' );
 
         } else {
 
@@ -348,7 +348,7 @@ app.factory( 'LobbyModel', [
         if ( !res || !res.approved ) {
 
           // Do nothing?
-          $log.warn( 'LobbyModel.requestGameLeave() >> FAILED/DENIED!' );
+          $log.warn( 'LobbyModel.onResGameLeave() >> FAILED/DENIED!' );
 
         } else {
 
@@ -392,7 +392,7 @@ app.factory( 'LobbyModel', [
         if ( !res || !res.approved ) {
 
             // Do nothing?
-            $log.warn( 'LobbyModel.requestSetReady() >> FAILED/DENIED!' );
+            $log.warn( 'LobbyModel.onResSetReady() >> FAILED/DENIED!' );
 
           } else {
 
@@ -411,7 +411,7 @@ app.factory( 'LobbyModel', [
         if ( !res || !res.approved ) {
 
           // Do nothing?
-          $log.warn( 'LobbyModel.requestSetWaiting() >> FAILED/DENIED!' );
+          $log.warn( 'LobbyModel.onResSetWaiting() >> FAILED/DENIED!' );
 
         } else {
 
